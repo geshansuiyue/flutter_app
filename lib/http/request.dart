@@ -64,7 +64,7 @@ class Request {
 
       // 这里可以根据后端的返回格式进行统一处理
       return response.data;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // 统一处理错误
       _handleError(e);
       rethrow;

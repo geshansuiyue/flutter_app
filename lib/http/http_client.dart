@@ -38,7 +38,7 @@ class HttpClient {
           }
           return handler.next(response);
         },
-        onError: (DioError e, handler) {
+        onError: (DioException e, handler) {
           if (kDebugMode) {
             print('请求错误: ${e.message}');
             if (e.response != null) {
