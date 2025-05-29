@@ -22,7 +22,6 @@ class Request {
       // 根据请求方法调用不同的Dio方法
       switch (method) {
         case RequestMethod.get:
-          print(path);
           response = await _dio.get(
             path,
             queryParameters: queryParameters,

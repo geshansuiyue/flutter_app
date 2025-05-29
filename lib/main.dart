@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/home/home.dart';
 import 'login/login.dart';
 
 void main() {
@@ -17,8 +18,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: '音乐播放器'),
-      routes: {'/login': (context) => const LoginScreen()},
-      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomePage(),
+      },
+      initialRoute: '/home',
     );
   }
 }
