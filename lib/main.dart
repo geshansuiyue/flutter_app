@@ -1,74 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
 import 'pages/login/login.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+  final router = GoRouter(
+    initialLocation: '/playlistDetail/12501254691',
+    routes: [
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(
+        path: '/playlistDetail/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return PlaylistDetail(id: id);
+        },
       ),
-      home: const MyHomePage(title: '音乐播放器'),
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomePage(),
-      },
-      initialRoute: '/home',
-    );
-  }
-}
+    ],
+  );
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+  runApp(MaterialApp.router(routerConfig: router, title: '音乐播放器'));
 }

@@ -27,22 +27,27 @@ class SongInfo extends StatelessWidget {
                   height: 60,
                 ),
               ),
-              SizedBox(width: 5),
+              SizedBox(width: 10),
               Padding(
                 padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      song.name,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 18),
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        song.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                      ),
                     ),
                     Text(
                       '$arStr$mainTitle',
                       textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 12, color: Colors.black54),
                     ),
                   ],
                 ),
