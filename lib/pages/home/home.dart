@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/pages/home/components/carousel.dart';
+import 'package:music_player/pages/home/components/my_playlist.dart';
 import 'package:music_player/pages/home/components/recommend_list.dart';
 import 'package:music_player/pages/home/components/recommend_songs.dart';
 
@@ -15,6 +16,7 @@ class HomePage extends StatelessWidget {
           const Carousel(),
           const RecommendList(),
           const RecommendSongs(),
+          const MyPlaylist(),
         ],
       ),
     );

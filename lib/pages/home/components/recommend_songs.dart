@@ -53,11 +53,12 @@ class _RecommendSongsState extends State<RecommendSongs> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 230,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
           itemCount: songList.length > 3 ? 3 : songList.length,
+          physics: NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             final item = songList[index];
 

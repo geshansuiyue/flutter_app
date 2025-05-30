@@ -42,7 +42,7 @@ class Playlistview extends StatelessWidget {
                         width: 100,
                         margin: const EdgeInsets.only(right: 10.0),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
+                          borderRadius: BorderRadius.circular(10.0),
                           child: Image(
                             image: NetworkImage(item.picUrl),
                             fit: BoxFit.cover,
