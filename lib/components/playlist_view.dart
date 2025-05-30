@@ -25,7 +25,7 @@ class Playlistview extends StatelessWidget {
                 color: const Color.fromARGB(219, 0, 0, 0),
               ),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             SizedBox(
               height: 130,
               child: ListView.builder(

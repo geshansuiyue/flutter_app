@@ -3,4 +3,5 @@ class HomeApi {
   final String personalized = '/recommend/resource';
   final String recommendSongs = '/recommend/songs';
   final String myPlaylist = '/user/playlist';
+  final String topList = '/toplist';
 }

@@ -52,24 +52,42 @@ class _RecommendSongsState extends State<RecommendSongs> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 230,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: songList.length > 3 ? 3 : songList.length,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            final item = songList[index];
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '推荐歌曲',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18.0,
+              color: const Color.fromARGB(219, 0, 0, 0),
+            ),
+          ),
+          SizedBox(height: 10),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              itemCount: songList.length > 3 ? 3 : songList.length,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final item = songList[index];
+                final marginBottom = index == 2 || index == songList.length - 1
+                    ? 0.0
+                    : 10.0;
 
-            return Column(
-              children: [
-                SongInfo(song: item),
-                SizedBox(height: 10),
-              ],
-            );
-          },
-        ),
+                return Column(
+                  children: [
+                    SongInfo(song: item),
+                    SizedBox(height: marginBottom),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

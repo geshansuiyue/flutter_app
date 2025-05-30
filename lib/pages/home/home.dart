@@ -3,6 +3,7 @@ import 'package:music_player/pages/home/components/carousel.dart';
 import 'package:music_player/pages/home/components/my_playlist.dart';
 import 'package:music_player/pages/home/components/recommend_list.dart';
 import 'package:music_player/pages/home/components/recommend_songs.dart';
+import 'package:music_player/pages/home/components/top_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,6 +18,7 @@ class HomePage extends StatelessWidget {
           const RecommendList(),
           const RecommendSongs(),
           const MyPlaylist(),
+          const TopList(),
         ],
       ),
     );
