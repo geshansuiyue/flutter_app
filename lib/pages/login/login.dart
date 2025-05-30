@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_player/api/user/user_api.dart';
-import '../http/request.dart';
+import '../../http/request.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
