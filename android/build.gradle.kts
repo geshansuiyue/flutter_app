@@ -1,8 +1,9 @@
 allprojects {
     repositories {
+        maven(url = "https://maven.aliyun.com/repository/public")
+        maven(url = "https://maven.aliyun.com/repository/google")
         google()
         mavenCentral()
-        maven { url = uri("https://mirrors.tuna.tsinghua.edu.cn/flutter/download.flutter.io") }
     }
 }
 

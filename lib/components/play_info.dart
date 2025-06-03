@@ -6,6 +6,7 @@ import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/store/song_store.dart';
 import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class PlayInfo extends StatefulWidget {
   const PlayInfo({super.key});
@@ -16,10 +17,19 @@ class PlayInfo extends StatefulWidget {
 
 class _PlayInfoState extends State<PlayInfo> {
   SongItem? song;
+  final player = AudioPlayer(playerId: 'play_info_player');
+  bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
+    player.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
+        setState(() {
+          _isPlaying = true;
+        });
+      }
+    });
   }
 
   @override
@@ -28,8 +38,25 @@ class _PlayInfoState extends State<PlayInfo> {
 
     final currentSongId = context.watch<SongStoreModel>().getCurSongId();
     if (currentSongId != 0) {
-      Fluttertoast.showToast(msg: currentSongId.toString());
       _querySongDetail(currentSongId);
+      _queryMusicUrl(currentSongId);
+    }
+  }
+
+  Future<void> _queryMusicUrl(int songId) async {
+    try {
+      var response = await Request.get(
+        SongApi().songUrl,
+        queryParameters: {'level': 'exhigh', 'id': songId},
+      );
+
+      if (response['code'] == 200) {
+        var info = response['data'];
+        var musicInfo = info[0];
+        await player.play(UrlSource(musicInfo['url']));
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '获取歌曲链接失败，请重试');
     }
   }
 
@@ -120,9 +147,21 @@ class _PlayInfoState extends State<PlayInfo> {
                   ),
                   IconButton(
                     onPressed: () {
-                      Fluttertoast.showToast(msg: '点击了播放按钮');
+                      if (_isPlaying) {
+                        player.pause();
+                        setState(() {
+                          _isPlaying = false;
+                        });
+                      } else {
+                        player.resume();
+                        setState(() {
+                          _isPlaying = true;
+                        });
+                      }
                     },
-                    icon: Icon(Icons.play_circle_outline, size: 30),
+                    icon: _isPlaying
+                        ? Icon(Icons.pause_circle_outline, size: 30)
+                        : Icon(Icons.play_circle_outline, size: 30),
                   ),
                 ],
               ),
