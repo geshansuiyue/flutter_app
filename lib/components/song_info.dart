@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/pages/home/type.dart';
+import 'package:music_player/store/song_store.dart';
+import 'package:provider/provider.dart';
 
 class SongInfo extends StatelessWidget {
   final SongItem song;
 
   const SongInfo({super.key, required this.song});
+
+  void _handlePlaySong(BuildContext context, int songId) {
+    // 可能需要更新当前播放的歌曲ID
+    context.read<SongStoreModel>().setCurSongId(songId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +67,16 @@ class SongInfo extends StatelessWidget {
               ),
             ],
           ),
-          Row(children: [Icon(Icons.play_arrow, color: Colors.black54)]),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  _handlePlaySong(context, song.id);
+                },
+                icon: Icon(Icons.play_arrow, color: Colors.black54),
+              ),
+            ],
+          ),
         ],
       ),
     ));

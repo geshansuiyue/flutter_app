@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:music_player/components/play_info.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
+import 'package:music_player/store/song_store.dart';
+import 'package:provider/provider.dart';
 import 'pages/login/login.dart';
 
 void main() {
@@ -21,7 +23,12 @@ void main() {
     ],
   );
 
-  runApp(PersistentFooterApp(router: router));
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => SongStoreModel())],
+      child: PersistentFooterApp(router: router),
+    ),
+  );
 }
 
 class PersistentFooterApp extends StatelessWidget {
