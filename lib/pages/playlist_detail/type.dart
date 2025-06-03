@@ -29,6 +29,9 @@ class ListDetailInfo {
   final String description;
   final List<SongItem> tracks;
   final CreatorInfo creator;
+  final int shareCount;
+  final int commentCount;
+  final int subscribedCount;
 
   ListDetailInfo({
     required this.id,
@@ -38,6 +41,9 @@ class ListDetailInfo {
     required this.description,
     required this.tracks,
     required this.creator,
+    required this.shareCount,
+    required this.commentCount,
+    required this.subscribedCount,
   });
 
   /// 工厂方法：从 Map 转换为 AlInfo 对象
@@ -45,6 +51,9 @@ class ListDetailInfo {
     return ListDetailInfo(
       id: json['id'],
       name: json['name'],
+      shareCount: json['shareCount'] ?? 0,
+      commentCount: json['commentCount'] ?? 0,
+      subscribedCount: json['subscribedCount'] ?? 0,
       playCount: json['playCount'] ?? 0,
       coverImgUrl: json['coverImgUrl'],
       description: json['description'] as String,

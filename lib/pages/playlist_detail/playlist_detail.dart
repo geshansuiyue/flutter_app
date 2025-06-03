@@ -5,6 +5,7 @@ import 'package:music_player/components/song_info.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/pages/playlist_detail/type.dart';
+import 'package:music_player/utils/helper.dart';
 
 class PlaylistDetail extends StatefulWidget {
   final String? id;
@@ -40,6 +41,9 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                 coverImgUrl: '',
                 description: '',
                 tracks: [],
+                shareCount: 0,
+                commentCount: 0,
+                subscribedCount: 0,
                 creator: CreatorInfo(userId: 0, nickname: '', avatarUrl: ''),
               );
         setState(() {
@@ -78,8 +82,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      SizedBox(
-                        width: 200,
+                      Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +123,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                                 ),
                                 SizedBox(width: 15),
                                 Text(
-                                  '${playListDetail.playCount}次播放',
+                                  '${NumberFormatUtil.formatWithUnit(playListDetail.playCount)}次播放',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.black54,
@@ -147,23 +150,38 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.share_sharp),
-                      onPressed: () {
-                        Fluttertoast.showToast(msg: '收藏功能暂未实现');
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.comment),
-                      onPressed: () {
-                        Fluttertoast.showToast(msg: '下载功能暂未实现');
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.collections),
+                    TextButton.icon(
                       onPressed: () {
                         Fluttertoast.showToast(msg: '分享功能暂未实现');
                       },
+                      icon: const Icon(Icons.share_rounded),
+                      label: Text(
+                        NumberFormatUtil.formatWithUnit(
+                          playListDetail.shareCount,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Fluttertoast.showToast(msg: '评论功能暂未实现');
+                      },
+                      icon: const Icon(Icons.comment),
+                      label: Text(
+                        NumberFormatUtil.formatWithUnit(
+                          playListDetail.commentCount,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Fluttertoast.showToast(msg: '收藏功能暂未实现');
+                      },
+                      icon: const Icon(Icons.collections),
+                      label: Text(
+                        NumberFormatUtil.formatWithUnit(
+                          playListDetail.subscribedCount,
+                        ),
+                      ),
                     ),
                   ],
                 ),
