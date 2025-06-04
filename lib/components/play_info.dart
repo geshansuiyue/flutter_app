@@ -20,6 +20,8 @@ class _PlayInfoState extends State<PlayInfo> {
   SongItem? song;
   final player = AudioPlayer(playerId: 'play_info_player');
   bool _isPlaying = false;
+  List<int> songIdList = [];
+  int _index = 0;
 
   @override
   void initState() {
@@ -37,7 +39,12 @@ class _PlayInfoState extends State<PlayInfo> {
           });
           throw UnimplementedError();
         case PlayerState.completed:
-          Fluttertoast.showToast(msg: '播放完成');
+          if (_index < songIdList.length - 1) {
+            var curSongId = songIdList[_index + 1];
+            _querySongDetail(curSongId);
+            _queryMusicUrl(curSongId);
+            _index++;
+          }
           setState(() {
             _isPlaying = false;
           });
@@ -57,10 +64,15 @@ class _PlayInfoState extends State<PlayInfo> {
     super.didChangeDependencies();
 
     final currentSongId = context.watch<SongStoreModel>().getCurSongId();
+    final curSongList = context.watch<SongStoreModel>().getSongList();
     if (currentSongId != 0) {
       _querySongDetail(currentSongId);
       _queryMusicUrl(currentSongId);
     }
+    setState(() {
+      songIdList = curSongList;
+      _index = 0;
+    });
   }
 
   Future<void> _queryMusicUrl(int songId) async {
@@ -74,6 +86,9 @@ class _PlayInfoState extends State<PlayInfo> {
         var info = response['data'];
         var musicInfo = info[0];
         await player.play(UrlSource(musicInfo['url']));
+        setState(() {
+          _isPlaying = true;
+        });
       }
     } catch (e) {
       Fluttertoast.showToast(msg: '获取歌曲链接失败，请重试');

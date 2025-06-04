@@ -5,7 +5,9 @@ import 'package:music_player/components/song_info.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/pages/playlist_detail/type.dart';
+import 'package:music_player/store/song_store.dart';
 import 'package:music_player/utils/helper.dart';
+import 'package:provider/provider.dart';
 
 class PlaylistDetail extends StatefulWidget {
   final String? id;
@@ -56,12 +58,28 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     }
   }
 
+  void _handlePlayAll(BuildContext context) {
+    if (songs.isEmpty) {
+      Fluttertoast.showToast(msg: '歌单为空，无法播放');
+    } else {
+      context.read<SongStoreModel>().setCurSongId(songs[0].id);
+      context.read<SongStoreModel>().setCurSongList(
+        songs.map((song) => song.id).toList(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!songs.isNotEmpty) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _handlePlayAll(context),
+        backgroundColor: const Color.fromARGB(255, 119, 190, 223),
+        child: Icon(Icons.play_arrow, size: 30, color: Colors.white),
+      ),
       body: Padding(
         padding: EdgeInsets.fromLTRB(16, 25, 16, 16),
         child: RefreshIndicator(
@@ -133,7 +151,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              playListDetail.description,
+                              playListDetail.description ?? '暂无简介',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
