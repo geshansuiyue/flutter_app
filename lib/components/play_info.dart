@@ -39,12 +39,7 @@ class _PlayInfoState extends State<PlayInfo> {
           });
           break;
         case PlayerState.completed:
-          if (_index < songIdList.length - 1) {
-            var curSongId = songIdList[_index + 1];
-            if (mounted) {
-              context.read<SongStoreModel>().setCurSongId(curSongId);
-            }
-          }
+          _pickNextSong();
           setState(() {
             _isPlaying = false;
           });
@@ -65,14 +60,26 @@ class _PlayInfoState extends State<PlayInfo> {
 
     final currentSongId = context.watch<SongStoreModel>().getCurSongId();
     final curSongList = context.watch<SongStoreModel>().getSongList();
+    final curSongItem = context.watch<SongStoreModel>().getSong();
     if (currentSongId != 0) {
-      _querySongDetail(currentSongId);
       _queryMusicUrl(currentSongId);
     }
     setState(() {
       songIdList = curSongList;
-      _index = curSongList.indexOf(currentSongId);
+      song = curSongItem;
     });
+    if (curSongList.isNotEmpty) {
+      _index = curSongList.indexOf(currentSongId);
+    }
+  }
+
+  void _pickNextSong() {
+    if (_index < songIdList.length - 1 && songIdList.isNotEmpty) {
+      var nextSongId = songIdList[_index + 1];
+      context.read<SongStoreModel>().setCurSongId(nextSongId);
+    } else {
+      Fluttertoast.showToast(msg: '已经是最后一首歌曲了');
+    }
   }
 
   Future<void> _queryMusicUrl(int songId) async {
@@ -91,35 +98,7 @@ class _PlayInfoState extends State<PlayInfo> {
         });
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: '获取歌曲链接失败，请重试');
-    }
-  }
-
-  Future<void> _querySongDetail(int songId) async {
-    try {
-      var response = await Request.get(
-        SongApi().songDetail,
-        queryParameters: {'ids': songId},
-      );
-      if (response['code'] == 200) {
-        var curSongInfo = response['songs'][0];
-
-        var songInfo = SongItem(
-          id: curSongInfo['id'],
-          name: curSongInfo['name'] ?? '',
-          mainTitle: curSongInfo['mainTitle'] ?? '',
-          al: AlInfo.fromJson(curSongInfo['al']),
-          ar: (curSongInfo['ar'] as List<dynamic>)
-              .map((arItem) => ArInfo(id: arItem['id'], name: arItem['name']))
-              .toList(),
-        );
-
-        setState(() {
-          song = songInfo;
-        });
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: '获取歌曲详情失败，请重试');
+      Fluttertoast.showToast(msg: '无版权，为您切换下一首');
     }
   }
 
