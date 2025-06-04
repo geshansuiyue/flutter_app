@@ -47,7 +47,7 @@ class _RecommendListState extends State<RecommendList> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
-      child: Playlistview(playList: playList, title: '推荐歌单'),
+      child: PlaylistView(playList: playList, title: '推荐歌单'),
     );
   }
 }

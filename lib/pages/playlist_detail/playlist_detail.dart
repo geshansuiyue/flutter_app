@@ -20,11 +20,37 @@ class PlaylistDetail extends StatefulWidget {
 class _PlaylistDetailState extends State<PlaylistDetail> {
   List<SongItem> songs = [];
   late ListDetailInfo playListDetail;
+  final ScrollController _scrollController = ScrollController();
+  final double _songHeight = 60.0; // AppBar的高度
 
   @override
   void initState() {
     super.initState();
     _fetchPlaylistDetail();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final curSongId = context.watch<SongStoreModel>().getCurSongId();
+    if (songs.isNotEmpty) {
+      final songIndex = songs.indexWhere((song) => song.id == curSongId);
+      if (songIndex != -1) {
+        // 如果当前歌曲在列表中，滚动到该歌曲位置
+        _scrollterToIndex(songIndex);
+      }
+    }
+  }
+
+  void _scrollterToIndex(int index) {
+    final offset = index * _songHeight;
+
+    _scrollController.animateTo(
+      offset,
+      duration: Duration(milliseconds: 1000),
+      curve: Curves.easeInOut,
+    );
   }
 
   Future<void> _fetchPlaylistDetail() async {
@@ -208,6 +234,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                 ),
                 Expanded(
                   child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: songs.length,
                     itemBuilder: (context, index) {
                       final item = songs[index];

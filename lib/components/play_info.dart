@@ -37,13 +37,13 @@ class _PlayInfoState extends State<PlayInfo> {
           setState(() {
             _isPlaying = false;
           });
-          throw UnimplementedError();
+          break;
         case PlayerState.completed:
           if (_index < songIdList.length - 1) {
             var curSongId = songIdList[_index + 1];
-            _querySongDetail(curSongId);
-            _queryMusicUrl(curSongId);
-            _index++;
+            if (mounted) {
+              context.read<SongStoreModel>().setCurSongId(curSongId);
+            }
           }
           setState(() {
             _isPlaying = false;
@@ -71,7 +71,7 @@ class _PlayInfoState extends State<PlayInfo> {
     }
     setState(() {
       songIdList = curSongList;
-      _index = 0;
+      _index = curSongList.indexOf(currentSongId);
     });
   }
 

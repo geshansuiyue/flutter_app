@@ -50,7 +50,7 @@ class _MyPlaylistState extends State<MyPlaylist> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
-      child: Playlistview(playList: playList, title: '我的歌单'),
+      child: PlaylistView(playList: playList, title: '我的歌单'),
     );
   }
 }

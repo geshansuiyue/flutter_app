@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:music_player/pages/home/type.dart';
 
-class Playlistview extends StatelessWidget {
+class PlaylistView extends StatelessWidget {
   final List<RecommendListItem> playList;
   final String title;
 
-  const Playlistview({super.key, required this.playList, required this.title});
+  const PlaylistView({super.key, required this.playList, required this.title});
 
   void _handleToDetail(int id, BuildContext context) {
     context.push('/playlistDetail/$id');

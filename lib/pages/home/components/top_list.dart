@@ -48,7 +48,7 @@ class _TopListState extends State<TopList> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
-      child: Playlistview(playList: list, title: '排行榜'),
+      child: PlaylistView(playList: list, title: '排行榜'),
     );
   }
 }
