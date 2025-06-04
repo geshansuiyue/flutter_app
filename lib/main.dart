@@ -9,7 +9,7 @@ import 'pages/login/login.dart';
 
 void main() {
   final router = GoRouter(
-    initialLocation: '/playlistDetail/152833237',
+    initialLocation: '/home',
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),

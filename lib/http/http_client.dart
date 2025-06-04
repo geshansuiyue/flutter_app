@@ -9,7 +9,7 @@ class HttpClient {
   HttpClient._internal() {
     // 基础配置
     BaseOptions options = BaseOptions(
-      baseUrl: "http://172.25.32.1:3000", // 替换为你的API基础URL
+      baseUrl: "http://172.31.0.1:3000", // 替换为你的API基础URL
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       contentType: Headers.jsonContentType,

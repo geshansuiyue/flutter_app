@@ -24,10 +24,29 @@ class _PlayInfoState extends State<PlayInfo> {
   void initState() {
     super.initState();
     player.onPlayerStateChanged.listen((state) {
-      if (state == PlayerState.playing) {
-        setState(() {
-          _isPlaying = true;
-        });
+      switch (state) {
+        case PlayerState.playing:
+          setState(() {
+            _isPlaying = true;
+          });
+          break;
+        case PlayerState.paused:
+          setState(() {
+            _isPlaying = false;
+          });
+          throw UnimplementedError();
+        case PlayerState.completed:
+          Fluttertoast.showToast(msg: '播放完成');
+          setState(() {
+            _isPlaying = false;
+          });
+          // 播放完成后可以选择自动播放下一首或其他逻辑
+          break;
+        default:
+          setState(() {
+            _isPlaying = false;
+          });
+          break;
       }
     });
   }
@@ -47,7 +66,7 @@ class _PlayInfoState extends State<PlayInfo> {
     try {
       var response = await Request.get(
         SongApi().songUrl,
-        queryParameters: {'level': 'exhigh', 'id': songId},
+        queryParameters: {'level': 'standard', 'id': songId},
       );
 
       if (response['code'] == 200) {
