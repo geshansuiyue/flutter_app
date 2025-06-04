@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:marquee/marquee.dart';
 import 'package:music_player/api/song/song_api.dart';
 import 'package:music_player/http/request.dart';
@@ -128,61 +129,64 @@ class _PlayInfoState extends State<PlayInfo> {
             color: const Color.fromARGB(255, 237, 222, 222),
             child: Padding(
               padding: EdgeInsetsGeometry.fromLTRB(15, 0, 15, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: Image(
-                            image: NetworkImage(song!.al.picUrl),
-                            width: 40,
-                            height: 40,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Marquee(
-                            text: '${song!.name} - ${arStr!}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.normal,
+              child: InkWell(
+                onTap: () => context.push('/playDetail'),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Image(
+                              image: NetworkImage(song!.al.picUrl),
+                              width: 40,
+                              height: 40,
                             ),
-                            scrollAxis: Axis.horizontal, // 滚动方向（水平/垂直）
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center, // 垂直方向对齐
-                            blankSpace: 20.0, // 首尾空白间距
-                            velocity: 50.0, // 滚动速度（像素/秒）
-                            fadingEdgeEndFraction: 0.1, // 渐隐边缘长度
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Marquee(
+                              text: '${song!.name} - ${arStr!}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              scrollAxis: Axis.horizontal, // 滚动方向（水平/垂直）
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.center, // 垂直方向对齐
+                              blankSpace: 20.0, // 首尾空白间距
+                              velocity: 50.0, // 滚动速度（像素/秒）
+                              fadingEdgeEndFraction: 0.1, // 渐隐边缘长度
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      if (_isPlaying) {
-                        player.pause();
-                        setState(() {
-                          _isPlaying = false;
-                        });
-                      } else {
-                        player.resume();
-                        setState(() {
-                          _isPlaying = true;
-                        });
-                      }
-                    },
-                    icon: _isPlaying
-                        ? Icon(Icons.pause_circle_outline, size: 30)
-                        : Icon(Icons.play_circle_outline, size: 30),
-                  ),
-                ],
+                    IconButton(
+                      onPressed: () {
+                        if (_isPlaying) {
+                          player.pause();
+                          setState(() {
+                            _isPlaying = false;
+                          });
+                        } else {
+                          player.resume();
+                          setState(() {
+                            _isPlaying = true;
+                          });
+                        }
+                      },
+                      icon: _isPlaying
+                          ? Icon(Icons.pause_circle_outline, size: 30)
+                          : Icon(Icons.play_circle_outline, size: 30),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

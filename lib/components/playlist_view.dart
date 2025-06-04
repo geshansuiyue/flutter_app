@@ -9,7 +9,7 @@ class Playlistview extends StatelessWidget {
   const Playlistview({super.key, required this.playList, required this.title});
 
   void _handleToDetail(int id, BuildContext context) {
-    context.go('/playlistDetail/$id');
+    context.push('/playlistDetail/$id');
   }
 
   @override

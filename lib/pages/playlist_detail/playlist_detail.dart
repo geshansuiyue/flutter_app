@@ -159,6 +159,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                         NumberFormatUtil.formatWithUnit(
                           playListDetail.shareCount,
                         ),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                     TextButton.icon(
@@ -170,6 +171,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                         NumberFormatUtil.formatWithUnit(
                           playListDetail.commentCount,
                         ),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                     TextButton.icon(
@@ -181,6 +183,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                         NumberFormatUtil.formatWithUnit(
                           playListDetail.subscribedCount,
                         ),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
