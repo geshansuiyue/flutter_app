@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_player/api/song/song_api.dart';
@@ -6,12 +7,19 @@ import 'package:music_player/pages/home/type.dart';
 
 class SongStoreModel with ChangeNotifier {
   int curSongId = 0;
+  int curSongTime = 0;
+  int curSongIndex = 0;
   List<int> songList = [];
   SongItem? song;
+  bool _isPlaying = false;
+  AudioPlayer? player;
 
   int getCurSongId() => curSongId;
   List<int> getSongList() => songList;
   SongItem? getSong() => song;
+  int getCurSongTime() => curSongTime;
+  bool getIsPlaying() => _isPlaying;
+  AudioPlayer? getPlayer() => player;
 
   Future<void> setCurSongId(int id) async {
     curSongId = id;
@@ -22,6 +30,43 @@ class SongStoreModel with ChangeNotifier {
   void setCurSongList(List<int> list) {
     songList = list;
     notifyListeners();
+  }
+
+  void setCurSongTime(int time) {
+    curSongTime = time;
+    notifyListeners();
+  }
+
+  void setCurSongIndex(int index) {
+    curSongIndex = index;
+  }
+
+  void setIsPlaying(bool isPlaying) {
+    _isPlaying = isPlaying;
+    notifyListeners();
+  }
+
+  void setPlayer(AudioPlayer audioPlayer) {
+    player = audioPlayer;
+  }
+
+  void songControll(String type) {
+    final listLength = songList.length;
+    if (type == 'next') {
+      if (curSongIndex < listLength - 1) {
+        setCurSongId(songList[curSongIndex + 1]);
+        setCurSongIndex(curSongIndex + 1);
+      } else {
+        Fluttertoast.showToast(msg: '已经是最后一首歌了');
+      }
+    } else {
+      if (curSongIndex > 0) {
+        curSongIndex--;
+        setCurSongId(songList[curSongIndex]);
+      } else {
+        Fluttertoast.showToast(msg: '已经是第一首歌了');
+      }
+    }
   }
 
   Future<void> _querySongDetail(int songId) async {

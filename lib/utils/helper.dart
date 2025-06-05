@@ -12,3 +12,16 @@ class NumberFormatUtil {
     }
   }
 }
+
+String formatMilliseconds(int milliseconds) {
+  // 处理负数情况
+  if (milliseconds < 0) milliseconds = 0;
+
+  // 计算分钟和秒
+  int totalSeconds = milliseconds ~/ 1000;
+  int minutes = totalSeconds ~/ 60;
+  int seconds = totalSeconds % 60;
+
+  // 格式化输出：确保秒数始终显示两位（例如 03:05 而非 3:5）
+  return '$minutes:${seconds.toString().padLeft(2, '0')}';
+}

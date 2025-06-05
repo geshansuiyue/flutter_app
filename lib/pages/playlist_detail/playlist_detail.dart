@@ -21,7 +21,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   List<SongItem> songs = [];
   late ListDetailInfo playListDetail;
   final ScrollController _scrollController = ScrollController();
-  final double _songHeight = 60.0; // AppBar的高度
+  final double _songHeight = 70.0; // AppBar的高度
 
   @override
   void initState() {

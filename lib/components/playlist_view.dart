@@ -51,6 +51,7 @@ class PlaylistView extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10.0),
                             child: Image(
+                              height: 100,
                               image: NetworkImage(item.picUrl),
                               fit: BoxFit.cover,
                             ),
