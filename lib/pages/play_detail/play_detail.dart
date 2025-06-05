@@ -174,6 +174,7 @@ class _PlayDetailState extends State<PlayDetail> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [

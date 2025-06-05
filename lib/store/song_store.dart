@@ -23,6 +23,9 @@ class SongStoreModel with ChangeNotifier {
 
   Future<void> setCurSongId(int id) async {
     curSongId = id;
+    if (songList.isNotEmpty) {
+      curSongIndex = songList.indexOf(id);
+    }
     await _querySongDetail(id);
     notifyListeners();
   }
