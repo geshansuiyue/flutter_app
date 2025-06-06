@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_player/api/song/song_api.dart';
+import 'package:music_player/api/user/user_api.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 
@@ -13,6 +14,7 @@ class SongStoreModel with ChangeNotifier {
   SongItem? song;
   bool _isPlaying = false;
   AudioPlayer? player;
+  List<int> likedSongList = [];
 
   int getCurSongId() => curSongId;
   List<int> getSongList() => songList;
@@ -20,6 +22,7 @@ class SongStoreModel with ChangeNotifier {
   int getCurSongTime() => curSongTime;
   bool getIsPlaying() => _isPlaying;
   AudioPlayer? getPlayer() => player;
+  List<int> getLikedSongList() => likedSongList;
 
   Future<void> setCurSongId(int id) async {
     curSongId = id;
@@ -51,6 +54,11 @@ class SongStoreModel with ChangeNotifier {
 
   void setPlayer(AudioPlayer audioPlayer) {
     player = audioPlayer;
+  }
+
+  void setLikedSongList(List<int> list) {
+    likedSongList = list;
+    notifyListeners();
   }
 
   void songControll(String type) {
@@ -95,6 +103,25 @@ class SongStoreModel with ChangeNotifier {
       }
     } catch (e) {
       Fluttertoast.showToast(msg: '获取歌曲详情失败，请重试');
+    }
+  }
+
+  Future<void> fetchLikedList() async {
+    try {
+      var response = await Request.get(
+        UserApi().favoriteList,
+        queryParameters: {
+          'uid': 85321922,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+      if (response['code'] == 200) {
+        var likedSongs = response['ids'] as List<dynamic>;
+        var likedSongIds = likedSongs.map((id) => id as int).toList();
+        setLikedSongList(likedSongIds);
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '获取我的喜欢列表失败');
     }
   }
 }

@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     try {
       var response = Request.get(
-        UserApi.getCaptcha,
+        UserApi().getCaptcha,
         queryParameters: {'phone': _phoneController.text},
       );
       response.then((value) {
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _userLogin() async {
     try {
       var response = await Request.get(
-        UserApi.login,
+        UserApi().login,
         queryParameters: {
           'phone': _phoneController.text,
           'captcha': _capchaController.text,

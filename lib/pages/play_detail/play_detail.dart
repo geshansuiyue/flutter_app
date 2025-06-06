@@ -2,6 +2,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:music_player/api/user/user_api.dart';
+import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/store/song_store.dart';
 import 'package:music_player/utils/helper.dart';
@@ -20,10 +22,14 @@ class _PlayDetailState extends State<PlayDetail> {
   int _curSongTime = 0;
   bool _isPlaying = false;
   AudioPlayer? _player;
+  List<int> _likedList = [];
 
   @override
   void initState() {
     super.initState();
+    if (mounted) {
+      context.read<SongStoreModel>().fetchLikedList();
+    }
     // 初始化或加载数据
   }
 
@@ -35,12 +41,14 @@ class _PlayDetailState extends State<PlayDetail> {
     final curSongTime = context.watch<SongStoreModel>().getCurSongTime();
     final isPlaying = context.watch<SongStoreModel>().getIsPlaying();
     final player = context.watch<SongStoreModel>().getPlayer();
+    final likedList = context.watch<SongStoreModel>().getLikedSongList();
     if (currentSong?.id != null) {
       setState(() {
         song = currentSong;
         _curSongTime = curSongTime;
         _isPlaying = isPlaying;
         _player = player;
+        _likedList = likedList;
       });
     }
   }
@@ -51,8 +59,6 @@ class _PlayDetailState extends State<PlayDetail> {
       songStore.songControll('next');
     } else if (type == 'prev') {
       songStore.songControll('prev');
-    } else if (type == 'play') {
-      Fluttertoast.showToast(msg: '播放/暂停');
     }
   }
 
@@ -66,6 +72,29 @@ class _PlayDetailState extends State<PlayDetail> {
     }
   }
 
+  Future<void> _likeSong(int id, bool isLiked) async {
+    try {
+      var response = await Request.get(
+        UserApi().favorite,
+        queryParameters: {
+          'id': id,
+          'like': !isLiked,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+
+      if (response['code'] == 200) {
+        if (mounted) {
+          context.read<SongStoreModel>().fetchLikedList();
+        }
+      } else {
+        Fluttertoast.showToast(msg: '请求失败，请重试');
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '请求失败，请重试');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (song == null) {
@@ -73,6 +102,7 @@ class _PlayDetailState extends State<PlayDetail> {
     }
 
     final singersStr = song!.ar.map((ar) => ar.name).join('/');
+    final isLiked = _likedList.contains(song!.id);
 
     return Center(
       child: SizedBox(
@@ -140,8 +170,12 @@ class _PlayDetailState extends State<PlayDetail> {
                     child: Row(
                       children: [
                         IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.favorite_border),
+                          tooltip: isLiked ? '不喜欢' : '喜欢',
+                          onPressed: () => _likeSong(song!.id, isLiked),
+                          icon: Icon(
+                            isLiked ? Icons.favorite : Icons.favorite_border,
+                          ),
+                          color: isLiked ? Colors.red : Colors.black,
                         ),
                         IconButton(onPressed: () {}, icon: Icon(Icons.message)),
                       ],

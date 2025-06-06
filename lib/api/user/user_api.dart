@@ -1,4 +1,6 @@
 class UserApi {
-  static final String getCaptcha = '/captcha/sent';
-  static final String login = '/login/cellphone';
+  final String getCaptcha = '/captcha/sent';
+  final String login = '/login/cellphone';
+  final String favoriteList = '/likelist';
+  final String favorite = '/like';
 }
