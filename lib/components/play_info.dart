@@ -20,7 +20,6 @@ class _PlayInfoState extends State<PlayInfo> {
   SongItem? song;
   final player = AudioPlayer(playerId: 'play_info_player');
   bool _isPlaying = false;
-  List<int> songIdList = [];
 
   @override
   void initState() {
@@ -39,6 +38,9 @@ class _PlayInfoState extends State<PlayInfo> {
           }
           break;
         case PlayerState.completed:
+          if (mounted) {
+            context.watch<SongStoreModel>().clearTimer();
+          }
           _pickNextSong();
           break;
         default:
@@ -51,18 +53,21 @@ class _PlayInfoState extends State<PlayInfo> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     final currentSongId = context.watch<SongStoreModel>().getCurSongId();
-    final curSongList = context.watch<SongStoreModel>().getSongList();
     final curSongItem = context.watch<SongStoreModel>().getSong();
     final isPlaying = context.watch<SongStoreModel>().getIsPlaying();
     if (currentSongId != 0 && song?.id != currentSongId) {
       _queryMusicUrl(currentSongId);
     }
     setState(() {
-      songIdList = curSongList;
       song = curSongItem;
       _isPlaying = isPlaying;
     });
@@ -87,6 +92,11 @@ class _PlayInfoState extends State<PlayInfo> {
           if (mounted) {
             context.read<SongStoreModel>().setCurSongTime(musicInfo['time']);
             context.read<SongStoreModel>().setIsPlaying(true);
+            final timer = context.read<SongStoreModel>().getTimer();
+            if (timer != null) {
+              timer.cancel();
+              context.read<SongStoreModel>().startTimer();
+            }
           }
         } else {
           Fluttertoast.showToast(msg: '无版权，为您切换下一首');
@@ -143,7 +153,8 @@ class _PlayInfoState extends State<PlayInfo> {
                               ),
                             ),
                             SizedBox(width: 10),
-                            Expanded(
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 180,
                               child: Marquee(
                                 text: '${song!.name} - ${arStr!}',
                                 style: TextStyle(

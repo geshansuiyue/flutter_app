@@ -39,7 +39,7 @@ class SongInfo extends StatelessWidget {
                 SizedBox(width: 10),
                 Padding(
                   padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
-                  child: Expanded(
+                  child: SizedBox(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,

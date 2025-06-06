@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,11 +20,12 @@ class PlayDetail extends StatefulWidget {
 
 class _PlayDetailState extends State<PlayDetail> {
   SongItem? song;
-  double _percent = 0.0;
   int _curSongTime = 0;
   bool _isPlaying = false;
   AudioPlayer? _player;
   List<int> _likedList = [];
+  int _duration = 0;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -40,8 +43,11 @@ class _PlayDetailState extends State<PlayDetail> {
     final currentSong = context.watch<SongStoreModel>().getSong();
     final curSongTime = context.watch<SongStoreModel>().getCurSongTime();
     final isPlaying = context.watch<SongStoreModel>().getIsPlaying();
-    final player = context.watch<SongStoreModel>().getPlayer();
+    final player = context.read<SongStoreModel>().getPlayer();
     final likedList = context.watch<SongStoreModel>().getLikedSongList();
+    final curDuration = context.watch<SongStoreModel>().getDuration();
+    final timer = context.read<SongStoreModel>().getTimer();
+
     if (currentSong?.id != null) {
       setState(() {
         song = currentSong;
@@ -49,6 +55,8 @@ class _PlayDetailState extends State<PlayDetail> {
         _isPlaying = isPlaying;
         _player = player;
         _likedList = likedList;
+        _duration = curDuration;
+        _timer = timer;
       });
     }
   }
@@ -96,6 +104,12 @@ class _PlayDetailState extends State<PlayDetail> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (song == null) {
       return const Center(child: Text('No song selected'));
@@ -103,11 +117,15 @@ class _PlayDetailState extends State<PlayDetail> {
 
     final singersStr = song!.ar.map((ar) => ar.name).join('/');
     final isLiked = _likedList.contains(song!.id);
+    final percent = _duration > 0
+        ? (_duration / _curSongTime > 1.0 ? 1.0 : _duration / _curSongTime)
+        : 0.0;
 
     return Center(
       child: SizedBox(
         child: Padding(
-          padding: EdgeInsetsGeometry.fromLTRB(15.0, 30.0, 15.0, 15.0),
+          // 修复：使用 EdgeInsets 而不是 EdgeInsetsGeometry
+          padding: EdgeInsets.fromLTRB(15.0, 30.0, 15.0, 15.0),
           child: Column(
             children: [
               Row(
@@ -187,21 +205,24 @@ class _PlayDetailState extends State<PlayDetail> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Slider(
-                    value: _percent,
-                    onChanged: (value) {
-                      Fluttertoast.showToast(msg: '滑动$value');
-                      setState(() {
-                        _percent = value;
-                      });
-                    },
+                  // 修复：添加 Container 为 Slider 提供约束
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Slider(
+                      value: percent,
+                      onChanged: (value) {
+                        Fluttertoast.showToast(msg: '滑动$value');
+                      },
+                    ),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.only(left: 18.0, right: 18.0),
+                    // 修复：使用 EdgeInsets 而不是 EdgeInsetsGeometry
+                    padding: EdgeInsets.only(left: 18.0, right: 18.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(formatMilliseconds(_curSongTime)),
+                        // 修复：时间显示可能需要调整
+                        Text(formatMilliseconds(_duration)),
                         Text(formatMilliseconds(_curSongTime)),
                       ],
                     ),

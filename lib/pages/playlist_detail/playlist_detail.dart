@@ -126,7 +126,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      Expanded(
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 142,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
