@@ -41,7 +41,10 @@ class _PlayInfoState extends State<PlayInfo> {
   @override
   Widget build(BuildContext context) {
     final currentRoute = ModalRoute.of(context)?.settings.name;
-    final isPlayDetailPage = currentRoute == '/playDetail';
+    final isPlayDetailPage = [
+      '/playDetail',
+      '/lyricView',
+    ].contains(currentRoute);
     final audioProvider = Provider.of<AudioStore>(context);
     if (song == null) {
       return SizedBox.shrink(); // 如果歌曲信息未加载，返回空组件

@@ -153,9 +153,14 @@ class _PlayDetailState extends State<PlayDetail> {
               SizedBox(
                 height: 300,
                 width: MediaQuery.of(context).size.width,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: Image.network(song!.al.picUrl, fit: BoxFit.cover),
+                child: GestureDetector(
+                  onTap: () {
+                    context.push('/lyricView');
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: Image.network(song!.al.picUrl, fit: BoxFit.cover),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -175,6 +180,8 @@ class _PlayDetailState extends State<PlayDetail> {
                         SizedBox(height: 5),
                         Text(
                           singersStr,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: TextStyle(fontSize: 14, color: Colors.black54),
                         ),
                       ],

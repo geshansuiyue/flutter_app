@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:music_player/components/play_info.dart';
+import 'package:music_player/pages/lyric_view/lyric_view.dart';
 import 'package:music_player/pages/play_detail/play_detail.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
@@ -30,6 +31,10 @@ void main() {
           final id = state.pathParameters['id'];
           return BasePage(child: PlaylistDetail(id: id));
         },
+      ),
+      GoRoute(
+        path: '/lyricView',
+        builder: (context, state) => BasePage(child: LyricView()),
       ),
     ],
   );

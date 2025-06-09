@@ -18,6 +18,7 @@ class AudioStore with ChangeNotifier {
   SongItem? _song;
   List<int> _likedSongList = [];
   List<SongItem> _playListSongs = [];
+  String _lyric = '';
 
   AudioPlayer get player => _player;
   bool get isPlaying => _isPlaying;
@@ -29,6 +30,7 @@ class AudioStore with ChangeNotifier {
   List<int> get curPlayList => _playList;
   SongItem? get song => _song;
   List<int> get likedSongList => _likedSongList;
+  String get lyric => _lyric;
 
   AudioStore() {
     _player.onPlayerStateChanged.listen((state) {
@@ -98,6 +100,7 @@ class AudioStore with ChangeNotifier {
     }
     await querySongDetail(id);
     await queryMusicUrl(id);
+    await queryLyric(id);
     notifyListeners();
   }
 
@@ -198,6 +201,23 @@ class AudioStore with ChangeNotifier {
       // ignore: empty_catches
     } catch (e) {
       Fluttertoast.showToast(msg: '获取歌曲链接失败，请重试');
+    }
+  }
+
+  Future<void> queryLyric(int songId) async {
+    try {
+      var response = await Request.get(
+        SongApi().lyric,
+        queryParameters: {'id': songId},
+      );
+
+      if (response['code'] == 200) {
+        var lyric = response['lrc']['lyric'];
+        _lyric = lyric;
+        notifyListeners();
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '获取歌词失败，请重试');
     }
   }
 
