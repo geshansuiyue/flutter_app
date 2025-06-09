@@ -7,7 +7,7 @@ import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 
 class AudioStore with ChangeNotifier {
-  final AudioPlayer _player = AudioPlayer(playerId: 'audio_store_player');
+  late AudioPlayer _player;
   bool _isPlaying = false;
   bool _isCompleted = false;
   Duration _duration = Duration.zero;
@@ -33,6 +33,14 @@ class AudioStore with ChangeNotifier {
   String get lyric => _lyric;
 
   AudioStore() {
+    _initializePlayer();
+  }
+
+  void _initializePlayer() {
+    _player = AudioPlayer(
+      playerId: 'audio_store_player_${DateTime.now().millisecondsSinceEpoch}',
+    );
+
     _player.onPlayerStateChanged.listen((state) {
       _isPlaying = state == PlayerState.playing;
       _isCompleted = false;
@@ -62,10 +70,21 @@ class AudioStore with ChangeNotifier {
   // 播放控制方法
   Future<void> play(String url) async {
     try {
+      await _player.stop();
+      await Future.delayed(Duration(milliseconds: 100));
       await _player.play(UrlSource(url));
       notifyListeners();
     } catch (e) {
-      Fluttertoast.showToast(msg: '播放失败，请重试');
+      // 如果播放失败，重新初始化播放器再尝试一次
+      try {
+        await _player.dispose();
+        _initializePlayer();
+        await Future.delayed(Duration(milliseconds: 200));
+        await _player.play(UrlSource(url));
+        notifyListeners();
+      } catch (e2) {
+        Fluttertoast.showToast(msg: '播放失败，请重试');
+      }
     }
   }
 
@@ -96,7 +115,14 @@ class AudioStore with ChangeNotifier {
       _curSongIndex = list.indexOf(id);
       _playList = list;
     } else {
-      _curSongIndex = _playList.indexOf(id);
+      final index = _playList.indexOf(id);
+      if (index >= 0) {
+        _curSongIndex = index;
+      } else {
+        // 如果歌曲不在播放列表中，添加到播放列表
+        _playList.add(id);
+        _curSongIndex = _playList.length - 1;
+      }
     }
     await querySongDetail(id);
     await queryMusicUrl(id);
@@ -213,7 +239,8 @@ class AudioStore with ChangeNotifier {
 
       if (response['code'] == 200) {
         var lyric = response['lrc']['lyric'];
-        _lyric = lyric;
+        var tlyric = response['tlyric']['lyric'];
+        _lyric = '$lyric\n$tlyric';
         notifyListeners();
       }
     } catch (e) {
@@ -223,6 +250,7 @@ class AudioStore with ChangeNotifier {
 
   @override
   void dispose() {
+    _player.dispose();
     // 不要调用 _player.dispose()，否则会重置播放状态
     super.dispose();
   }

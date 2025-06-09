@@ -6,16 +6,13 @@ import 'package:provider/provider.dart';
 
 class CustomUINetease extends UINetease {
   @override
-  TextStyle getPlayingMainTextStyle() => TextStyle(
-    color: Colors.red,
-    fontSize: otherMainSize,
-    fontWeight: FontWeight.bold,
-  );
+  TextStyle getPlayingMainTextStyle() =>
+      TextStyle(color: Colors.red, fontSize: 14.0, fontWeight: FontWeight.bold);
 
   @override
   TextStyle getOtherMainTextStyle() => TextStyle(
     color: Colors.black45,
-    fontSize: otherMainSize,
+    fontSize: 14.0,
     fontWeight: FontWeight.bold,
   );
 
