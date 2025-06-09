@@ -25,3 +25,10 @@ String formatMilliseconds(int milliseconds) {
   // 格式化输出：确保秒数始终显示两位（例如 03:05 而非 3:5）
   return '$minutes:${seconds.toString().padLeft(2, '0')}';
 }
+
+String formatDuration(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+  String minutes = twoDigits(duration.inMinutes);
+  String seconds = twoDigits(duration.inSeconds.remainder(60));
+  return '$minutes:$seconds';
+}

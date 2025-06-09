@@ -4,7 +4,7 @@ import 'package:music_player/components/play_info.dart';
 import 'package:music_player/pages/play_detail/play_detail.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
-import 'package:music_player/store/song_store.dart';
+import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
 import 'pages/login/login.dart';
 
@@ -36,7 +36,9 @@ void main() {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => SongStoreModel())],
+      providers: [
+        ChangeNotifierProvider(create: (BuildContext context) => AudioStore()),
+      ],
       child: MaterialApp.router(routerConfig: router, title: '音乐播放器'),
     ),
   );

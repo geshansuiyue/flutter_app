@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:music_player/api/user/user_api.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
-import 'package:music_player/store/song_store.dart';
+import 'package:music_player/store/audio_store.dart';
 import 'package:music_player/utils/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -20,18 +19,16 @@ class PlayDetail extends StatefulWidget {
 
 class _PlayDetailState extends State<PlayDetail> {
   SongItem? song;
-  int _curSongTime = 0;
   bool _isPlaying = false;
-  AudioPlayer? _player;
   List<int> _likedList = [];
-  int _duration = 0;
+
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     if (mounted) {
-      context.read<SongStoreModel>().fetchLikedList();
+      context.read<AudioStore>().fetchLikedList();
     }
     // 初始化或加载数据
   }
@@ -40,29 +37,21 @@ class _PlayDetailState extends State<PlayDetail> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final currentSong = context.watch<SongStoreModel>().getSong();
-    final curSongTime = context.watch<SongStoreModel>().getCurSongTime();
-    final isPlaying = context.watch<SongStoreModel>().getIsPlaying();
-    final player = context.read<SongStoreModel>().getPlayer();
-    final likedList = context.watch<SongStoreModel>().getLikedSongList();
-    final curDuration = context.watch<SongStoreModel>().getDuration();
-    final timer = context.read<SongStoreModel>().getTimer();
+    final currentSong = context.watch<AudioStore>().song;
+    final isPlaying = context.watch<AudioStore>().isPlaying;
+    final likedList = context.watch<AudioStore>().likedSongList;
 
     if (currentSong?.id != null) {
       setState(() {
         song = currentSong;
-        _curSongTime = curSongTime;
         _isPlaying = isPlaying;
-        _player = player;
         _likedList = likedList;
-        _duration = curDuration;
-        _timer = timer;
       });
     }
   }
 
   void _songControll(String type) {
-    final songStore = context.read<SongStoreModel>();
+    final songStore = context.read<AudioStore>();
     if (type == 'next') {
       songStore.songControll('next');
     } else if (type == 'prev') {
@@ -70,13 +59,18 @@ class _PlayDetailState extends State<PlayDetail> {
     }
   }
 
+  void _handleSlideSeek(double value) {}
+
   void _handlePlayControll() {
     if (_isPlaying) {
-      _player?.pause();
-      context.read<SongStoreModel>().setIsPlaying(false);
+      context.read<AudioStore>().pause();
     } else {
-      _player?.resume();
-      context.read<SongStoreModel>().setIsPlaying(true);
+      final isCompleted = context.read<AudioStore>().isCompleted;
+      if (isCompleted) {
+        context.read<AudioStore>().replay();
+      } else {
+        context.read<AudioStore>().resume();
+      }
     }
   }
 
@@ -93,7 +87,7 @@ class _PlayDetailState extends State<PlayDetail> {
 
       if (response['code'] == 200) {
         if (mounted) {
-          context.read<SongStoreModel>().fetchLikedList();
+          context.read<AudioStore>().fetchLikedList();
         }
       } else {
         Fluttertoast.showToast(msg: '请求失败，请重试');
@@ -117,8 +111,12 @@ class _PlayDetailState extends State<PlayDetail> {
 
     final singersStr = song!.ar.map((ar) => ar.name).join('/');
     final isLiked = _likedList.contains(song!.id);
-    final percent = _duration > 0
-        ? (_duration / _curSongTime > 1.0 ? 1.0 : _duration / _curSongTime)
+    final curDuration = context.watch<AudioStore>().duration;
+    final curPosition = context.watch<AudioStore>().position;
+    final percent = curDuration > Duration.zero
+        ? (curPosition.inMilliseconds / curDuration.inMilliseconds) > 1.0
+              ? 1.0
+              : (curPosition.inMilliseconds / curDuration.inMilliseconds)
         : 0.0;
 
     return Center(
@@ -211,7 +209,7 @@ class _PlayDetailState extends State<PlayDetail> {
                     child: Slider(
                       value: percent,
                       onChanged: (value) {
-                        Fluttertoast.showToast(msg: '滑动$value');
+                        _handleSlideSeek(value);
                       },
                     ),
                   ),
@@ -222,8 +220,8 @@ class _PlayDetailState extends State<PlayDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // 修复：时间显示可能需要调整
-                        Text(formatMilliseconds(_duration)),
-                        Text(formatMilliseconds(_curSongTime)),
+                        Text(formatDuration(curPosition)),
+                        Text(formatDuration(curDuration)),
                       ],
                     ),
                   ),

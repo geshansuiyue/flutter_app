@@ -5,7 +5,7 @@ import 'package:music_player/components/song_info.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/pages/playlist_detail/type.dart';
-import 'package:music_player/store/song_store.dart';
+import 'package:music_player/store/audio_store.dart';
 import 'package:music_player/utils/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +22,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   late ListDetailInfo playListDetail;
   final ScrollController _scrollController = ScrollController();
   final double _songHeight = 70.0; // AppBar的高度
+  int prevIndex = 0;
 
   @override
   void initState() {
@@ -33,12 +34,14 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final curSongId = context.watch<SongStoreModel>().getCurSongId();
+    final curSongIndex = context.watch<AudioStore>().curSongIndex;
     if (songs.isNotEmpty) {
-      final songIndex = songs.indexWhere((song) => song.id == curSongId);
-      if (songIndex != -1) {
+      if (curSongIndex > 0 && curSongIndex != prevIndex) {
         // 如果当前歌曲在列表中，滚动到该歌曲位置
-        _scrollterToIndex(songIndex);
+        _scrollterToIndex(curSongIndex);
+        setState(() {
+          prevIndex = curSongIndex;
+        });
       }
     }
   }
@@ -78,6 +81,10 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
           playListDetail = info;
           songs = info.tracks;
         });
+
+        if (mounted) {
+          context.read<AudioStore>().setCurPlayListSongs(songs);
+        }
       }
     } catch (e) {
       Fluttertoast.showToast(msg: '获取歌单详情失败');
@@ -88,8 +95,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     if (songs.isEmpty) {
       Fluttertoast.showToast(msg: '歌单为空，无法播放');
     } else {
-      context.read<SongStoreModel>().setCurSongId(songs[0].id);
-      context.read<SongStoreModel>().setCurSongList(
+      context.read<AudioStore>().setCurSongId(songs[0].id);
+      context.read<AudioStore>().setCurPlayList(
         songs.map((song) => song.id).toList(),
       );
     }
@@ -102,6 +109,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     }
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        mini: true,
         onPressed: () => _handlePlayAll(context),
         backgroundColor: const Color.fromARGB(255, 119, 190, 223),
         child: Icon(Icons.play_arrow, size: 30, color: Colors.white),
@@ -246,7 +254,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
                       return Column(
                         children: [
-                          SongInfo(song: item),
+                          SongInfo(song: item, isInPlaylist: true),
                           SizedBox(height: marginBottom),
                         ],
                       );

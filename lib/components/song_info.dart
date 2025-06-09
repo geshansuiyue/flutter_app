@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/pages/home/type.dart';
-import 'package:music_player/store/song_store.dart';
+import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
 
 class SongInfo extends StatelessWidget {
   final SongItem song;
+  final bool? isInPlaylist;
 
-  const SongInfo({super.key, required this.song});
+  const SongInfo({super.key, required this.song, this.isInPlaylist});
 
   void _handlePlaySong(BuildContext context, int songId) {
     // 可能需要更新当前播放的歌曲ID
-    context.read<SongStoreModel>().setCurSongId(songId);
+    context.read<AudioStore>().setCurSongId(songId, isInPlaylist: isInPlaylist);
   }
 
   @override

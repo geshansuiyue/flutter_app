@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marquee/marquee.dart';
-import 'package:music_player/api/song/song_api.dart';
-import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
-import 'package:music_player/store/song_store.dart';
+import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 class PlayInfo extends StatefulWidget {
   const PlayInfo({super.key});
@@ -18,38 +14,11 @@ class PlayInfo extends StatefulWidget {
 
 class _PlayInfoState extends State<PlayInfo> {
   SongItem? song;
-  final player = AudioPlayer(playerId: 'play_info_player');
   bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    context.read<SongStoreModel>().setPlayer(player);
-    player.onPlayerStateChanged.listen((state) {
-      switch (state) {
-        case PlayerState.playing:
-          if (mounted && _isPlaying) {
-            context.read<SongStoreModel>().setIsPlaying(true);
-          }
-          break;
-        case PlayerState.paused:
-          if (mounted) {
-            context.read<SongStoreModel>().setIsPlaying(false);
-          }
-          break;
-        case PlayerState.completed:
-          if (mounted) {
-            context.watch<SongStoreModel>().clearTimer();
-          }
-          _pickNextSong();
-          break;
-        default:
-          if (mounted) {
-            context.read<SongStoreModel>().setIsPlaying(false);
-          }
-          break;
-      }
-    });
   }
 
   @override
@@ -61,56 +30,19 @@ class _PlayInfoState extends State<PlayInfo> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final currentSongId = context.watch<SongStoreModel>().getCurSongId();
-    final curSongItem = context.watch<SongStoreModel>().getSong();
-    final isPlaying = context.watch<SongStoreModel>().getIsPlaying();
-    if (currentSongId != 0 && song?.id != currentSongId) {
-      _queryMusicUrl(currentSongId);
-    }
+    final curSongItem = context.watch<AudioStore>().song;
+    final isPlaying = context.watch<AudioStore>().isPlaying;
     setState(() {
       song = curSongItem;
       _isPlaying = isPlaying;
     });
   }
 
-  void _pickNextSong() {
-    context.read<SongStoreModel>().songControll('next');
-  }
-
-  Future<void> _queryMusicUrl(int songId) async {
-    try {
-      var response = await Request.get(
-        SongApi().songUrl,
-        queryParameters: {'level': 'standard', 'id': songId},
-      );
-
-      if (response['code'] == 200) {
-        var info = response['data'];
-        var musicInfo = info[0];
-        if (musicInfo['url'] != null) {
-          await player.play(UrlSource(musicInfo['url']));
-          if (mounted) {
-            context.read<SongStoreModel>().setCurSongTime(musicInfo['time']);
-            context.read<SongStoreModel>().setIsPlaying(true);
-            final timer = context.read<SongStoreModel>().getTimer();
-            if (timer != null) {
-              timer.cancel();
-              context.read<SongStoreModel>().startTimer();
-            }
-          }
-        } else {
-          Fluttertoast.showToast(msg: '无版权，为您切换下一首');
-          _pickNextSong();
-        }
-      }
-      // ignore: empty_catches
-    } catch (e) {}
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentRoute = ModalRoute.of(context)?.settings.name;
     final isPlayDetailPage = currentRoute == '/playDetail';
+    final audioProvider = Provider.of<AudioStore>(context);
     if (song == null) {
       return SizedBox.shrink(); // 如果歌曲信息未加载，返回空组件
     }
@@ -177,12 +109,12 @@ class _PlayInfoState extends State<PlayInfo> {
                       IconButton(
                         onPressed: () {
                           if (_isPlaying) {
-                            player.pause();
+                            audioProvider.pause();
                             setState(() {
                               _isPlaying = false;
                             });
                           } else {
-                            player.resume();
+                            audioProvider.resume();
                             setState(() {
                               _isPlaying = true;
                             });
