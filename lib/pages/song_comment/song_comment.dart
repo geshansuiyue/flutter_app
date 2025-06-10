@@ -21,6 +21,7 @@ class _SongCommentState extends State<SongComment>
     comments: [],
   );
   late TabController tabController;
+  int offset = 0;
 
   @override
   void initState() {
@@ -34,11 +35,17 @@ class _SongCommentState extends State<SongComment>
 
     final curSongItem = context.watch<AudioStore>().song;
     final curSongCommentInfo = context.watch<AudioStore>().songCommentInfo;
+    final curOffset = context.watch<AudioStore>().offset;
 
     setState(() {
       song = curSongItem;
       songCommentInfo = curSongCommentInfo;
+      offset = curOffset;
     });
+  }
+
+  Future<void> _loadMoreComments() async {
+    await context.read<AudioStore>().querySongComments(song!.id, offset + 1);
   }
 
   @override
@@ -125,8 +132,15 @@ class _SongCommentState extends State<SongComment>
               child: TabBarView(
                 controller: tabController, // 关联控制器
                 children: [
-                  CommentInfo(comments: songCommentInfo.hotComments),
-                  CommentInfo(comments: songCommentInfo.comments),
+                  CommentInfo(
+                    comments: songCommentInfo.hotComments,
+                    loadMoreComments: _loadMoreComments,
+                    isHotComments: true,
+                  ),
+                  CommentInfo(
+                    comments: songCommentInfo.comments,
+                    loadMoreComments: _loadMoreComments,
+                  ),
                 ],
               ),
             ),

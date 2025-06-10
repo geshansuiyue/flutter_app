@@ -26,6 +26,7 @@ class AudioStore with ChangeNotifier {
     hotComments: [],
     comments: [],
   );
+  int _offset = 0;
 
   AudioPlayer get player => _player;
   bool get isPlaying => _isPlaying;
@@ -40,6 +41,7 @@ class AudioStore with ChangeNotifier {
   String get lyric => _lyric;
   String get tlyric => _tlyric;
   SongCommentInfo get songCommentInfo => _songCommentInfo;
+  int get offset => _offset;
 
   AudioStore() {
     _initializePlayer();
@@ -136,7 +138,7 @@ class AudioStore with ChangeNotifier {
     await querySongDetail(id);
     await queryMusicUrl(id);
     await queryLyric(id);
-    await querySongComments(id);
+    await querySongComments(id, 0);
     notifyListeners();
   }
 
@@ -257,15 +259,22 @@ class AudioStore with ChangeNotifier {
     }
   }
 
-  Future<void> querySongComments(int songId) async {
+  Future<void> querySongComments(int songId, int offset) async {
     try {
       var response = await Request.get(
         SongApi().songComment,
-        queryParameters: {'id': songId},
+        queryParameters: {'id': songId, 'offset': offset, 'limit': 20},
       );
 
       if (response['code'] == 200) {
-        _songCommentInfo = SongCommentInfo.fromJson(response);
+        var curSongCommentInfo = SongCommentInfo.fromJson(response);
+        if (offset == 0) {
+          _songCommentInfo = curSongCommentInfo;
+        } else {
+          _songCommentInfo.comments.addAll(curSongCommentInfo.comments);
+          _songCommentInfo.hotComments.addAll(curSongCommentInfo.hotComments);
+        }
+        _offset = offset;
 
         notifyListeners();
       }

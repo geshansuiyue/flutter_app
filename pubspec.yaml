@@ -43,6 +43,7 @@ dependencies:
     marquee: ^2.3.0
     audioplayers: ^6.4.0
     flutter_lyric: ^2.0.4+6
+    pull_to_refresh_flutter3: ^2.0.2
 
 dev_dependencies:
     flutter_test:
