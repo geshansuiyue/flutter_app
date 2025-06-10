@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 import 'package:music_player/api/user/user_api.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
+import 'package:music_player/pages/play_detail/components/info.dart';
 import 'package:music_player/store/audio_store.dart';
 import 'package:music_player/utils/helper.dart';
 import 'package:provider/provider.dart';
+
+import 'components/lyric.dart';
 
 class PlayDetail extends StatefulWidget {
   const PlayDetail({super.key});
@@ -21,8 +23,7 @@ class _PlayDetailState extends State<PlayDetail> {
   SongItem? song;
   bool _isPlaying = false;
   List<int> _likedList = [];
-
-  Timer? _timer;
+  bool _isShowLyric = false;
 
   @override
   void initState() {
@@ -74,6 +75,12 @@ class _PlayDetailState extends State<PlayDetail> {
     }
   }
 
+  void _changIsLyric(bool isLyric) {
+    setState(() {
+      _isShowLyric = isLyric;
+    });
+  }
+
   Future<void> _likeSong(int id, bool isLiked) async {
     try {
       var response = await Request.get(
@@ -99,7 +106,6 @@ class _PlayDetailState extends State<PlayDetail> {
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -109,7 +115,6 @@ class _PlayDetailState extends State<PlayDetail> {
       return const Center(child: Text('No song selected'));
     }
 
-    final singersStr = song!.ar.map((ar) => ar.name).join('/');
     final isLiked = _likedList.contains(song!.id);
     final curDuration = context.watch<AudioStore>().duration;
     final curPosition = context.watch<AudioStore>().position;
@@ -122,90 +127,17 @@ class _PlayDetailState extends State<PlayDetail> {
     return Center(
       child: SizedBox(
         child: Padding(
-          // 修复：使用 EdgeInsets 而不是 EdgeInsetsGeometry
           padding: EdgeInsets.fromLTRB(15.0, 30.0, 15.0, 15.0),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.expand_more_sharp, size: 30),
-                    onPressed: () {
-                      context.pop();
-                    },
-                  ),
-                  SizedBox(
-                    width: 200,
-                    child: Text(
-                      song!.name,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        color: Colors.black87,
-                      ),
+              _isShowLyric
+                  ? LyricView(changeIsLyric: _changIsLyric)
+                  : Info(
+                      song: song!,
+                      isLiked: isLiked,
+                      likeSong: _likeSong,
+                      changeIsLyric: _changIsLyric,
                     ),
-                  ),
-                  const SizedBox(width: 48), // 占位符，保持对齐
-                ],
-              ),
-              SizedBox(
-                height: 300,
-                width: MediaQuery.of(context).size.width,
-                child: GestureDetector(
-                  onTap: () {
-                    context.push('/lyricView');
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10.0),
-                    child: Image.network(song!.al.picUrl, fit: BoxFit.cover),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          song!.name,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          singersStr,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          tooltip: isLiked ? '不喜欢' : '喜欢',
-                          onPressed: () => _likeSong(song!.id, isLiked),
-                          icon: Icon(
-                            isLiked ? Icons.favorite : Icons.favorite_border,
-                          ),
-                          color: isLiked ? Colors.red : Colors.black,
-                        ),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.message)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

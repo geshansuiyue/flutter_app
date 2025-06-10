@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lyric/lyrics_reader.dart';
-import 'package:go_router/go_router.dart';
 import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
 
@@ -38,7 +37,9 @@ class CustomUINetease extends UINetease {
 }
 
 class LyricView extends StatefulWidget {
-  const LyricView({super.key});
+  const LyricView({super.key, required this.changeIsLyric});
+
+  final Function(bool) changeIsLyric;
 
   @override
   State<LyricView> createState() => _LyricViewState();
@@ -79,27 +80,30 @@ class _LyricViewState extends State<LyricView> {
 
     var customUI = CustomUINetease();
 
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity! < 0) {
-          // 速度为负，表示向左滑动
-          context.pop();
-        }
-      },
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(15),
-          child: LyricsReader(
-            model: lyricModel,
-            position: currentPosition,
-            lyricUi: customUI,
-            playing: _isPlaying,
-            size: Size(
-              double.infinity,
-              MediaQuery.of(context).size.height - 100,
-            ),
-            emptyBuilder: () => const Center(
-              child: Text("暂无歌词", style: TextStyle(color: Colors.red)),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 220,
+      child: GestureDetector(
+        onTap: () {
+          widget.changeIsLyric(false);
+        },
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: LyricsReader(
+              model: lyricModel,
+              position: currentPosition,
+              lyricUi: customUI,
+              playing: _isPlaying,
+              onTap: () {
+                widget.changeIsLyric(false);
+              },
+              size: Size(
+                double.infinity,
+                MediaQuery.of(context).size.height - 250,
+              ),
+              emptyBuilder: () => const Center(
+                child: Text("暂无歌词", style: TextStyle(color: Colors.red)),
+              ),
             ),
           ),
         ),
