@@ -6,14 +6,17 @@ class Info extends StatelessWidget {
   const Info({
     super.key,
     required this.song,
+    required this.total,
     required this.isLiked,
     required this.likeSong,
     required this.changeIsLyric,
   });
+
   final SongItem song;
   final bool isLiked;
   final Function(int, bool) likeSong;
   final Function(bool) changeIsLyric;
+  final int total;
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +94,18 @@ class Info extends StatelessWidget {
                       onPressed: () => likeSong(song.id, isLiked),
                       icon: Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
+                        size: 30,
                       ),
                       color: isLiked ? Colors.red : Colors.black,
                     ),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.message)),
+                    Badge(
+                      label: Text((total > 999 ? '999+' : '').toString()),
+                      offset: Offset(-10, 3),
+                      child: IconButton(
+                        onPressed: () => context.push('/songComment'),
+                        icon: Icon(Icons.message, size: 30),
+                      ),
+                    ),
                   ],
                 ),
               ),

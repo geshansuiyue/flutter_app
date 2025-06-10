@@ -5,6 +5,7 @@ import 'package:music_player/api/song/song_api.dart';
 import 'package:music_player/api/user/user_api.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
+import 'package:music_player/store/type.dart';
 
 class AudioStore with ChangeNotifier {
   late AudioPlayer _player;
@@ -19,7 +20,12 @@ class AudioStore with ChangeNotifier {
   List<int> _likedSongList = [];
   List<SongItem> _playListSongs = [];
   String _lyric = '';
-  String _tlyric = ''; // 翻译歌词
+  String _tlyric = '';
+  SongCommentInfo _songCommentInfo = SongCommentInfo(
+    total: 0,
+    hotComments: [],
+    comments: [],
+  );
 
   AudioPlayer get player => _player;
   bool get isPlaying => _isPlaying;
@@ -33,6 +39,7 @@ class AudioStore with ChangeNotifier {
   List<int> get likedSongList => _likedSongList;
   String get lyric => _lyric;
   String get tlyric => _tlyric;
+  SongCommentInfo get songCommentInfo => _songCommentInfo;
 
   AudioStore() {
     _initializePlayer();
@@ -129,6 +136,7 @@ class AudioStore with ChangeNotifier {
     await querySongDetail(id);
     await queryMusicUrl(id);
     await queryLyric(id);
+    await querySongComments(id);
     notifyListeners();
   }
 
@@ -249,10 +257,26 @@ class AudioStore with ChangeNotifier {
     }
   }
 
+  Future<void> querySongComments(int songId) async {
+    try {
+      var response = await Request.get(
+        SongApi().songComment,
+        queryParameters: {'id': songId},
+      );
+
+      if (response['code'] == 200) {
+        _songCommentInfo = SongCommentInfo.fromJson(response);
+
+        notifyListeners();
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '获取歌曲评论失败，请重试');
+    }
+  }
+
   @override
   void dispose() {
     _player.dispose();
-    // 不要调用 _player.dispose()，否则会重置播放状态
     super.dispose();
   }
 }

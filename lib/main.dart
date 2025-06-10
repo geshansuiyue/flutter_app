@@ -4,6 +4,7 @@ import 'package:music_player/components/play_info.dart';
 import 'package:music_player/pages/play_detail/play_detail.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
+import 'package:music_player/pages/song_comment/song_comment.dart';
 import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
 import 'pages/login/login.dart';
@@ -23,6 +24,10 @@ void main() {
       GoRoute(
         path: '/playDetail',
         builder: (context, state) => BasePage(child: PlayDetail()),
+      ),
+      GoRoute(
+        path: '/songComment',
+        builder: (context, state) => BasePage(child: SongComment()),
       ),
       GoRoute(
         path: '/playlistDetail/:id',

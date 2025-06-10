@@ -7,6 +7,7 @@ import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/home/type.dart';
 import 'package:music_player/pages/play_detail/components/info.dart';
 import 'package:music_player/store/audio_store.dart';
+import 'package:music_player/store/type.dart';
 import 'package:music_player/utils/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class _PlayDetailState extends State<PlayDetail> {
   bool _isPlaying = false;
   List<int> _likedList = [];
   bool _isShowLyric = false;
+  late SongCommentInfo _songCommentInfo;
 
   @override
   void initState() {
@@ -38,15 +40,17 @@ class _PlayDetailState extends State<PlayDetail> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final currentSong = context.watch<AudioStore>().song;
-    final isPlaying = context.watch<AudioStore>().isPlaying;
-    final likedList = context.watch<AudioStore>().likedSongList;
+    final currentSong = context.read<AudioStore>().song;
+    final isPlaying = context.read<AudioStore>().isPlaying;
+    final likedList = context.read<AudioStore>().likedSongList;
+    final songCommentInfo = context.read<AudioStore>().songCommentInfo;
 
     if (currentSong?.id != null) {
       setState(() {
         song = currentSong;
         _isPlaying = isPlaying;
         _likedList = likedList;
+        _songCommentInfo = songCommentInfo;
       });
     }
   }
@@ -134,6 +138,7 @@ class _PlayDetailState extends State<PlayDetail> {
                   ? LyricView(changeIsLyric: _changIsLyric)
                   : Info(
                       song: song!,
+                      total: _songCommentInfo.total,
                       isLiked: isLiked,
                       likeSong: _likeSong,
                       changeIsLyric: _changIsLyric,
