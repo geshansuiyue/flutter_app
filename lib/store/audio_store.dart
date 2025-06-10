@@ -19,6 +19,7 @@ class AudioStore with ChangeNotifier {
   List<int> _likedSongList = [];
   List<SongItem> _playListSongs = [];
   String _lyric = '';
+  String _tlyric = ''; // 翻译歌词
 
   AudioPlayer get player => _player;
   bool get isPlaying => _isPlaying;
@@ -31,6 +32,7 @@ class AudioStore with ChangeNotifier {
   SongItem? get song => _song;
   List<int> get likedSongList => _likedSongList;
   String get lyric => _lyric;
+  String get tlyric => _tlyric;
 
   AudioStore() {
     _initializePlayer();
@@ -238,9 +240,8 @@ class AudioStore with ChangeNotifier {
       );
 
       if (response['code'] == 200) {
-        var lyric = response['lrc']['lyric'];
-        var tlyric = response['tlyric']['lyric'];
-        _lyric = '$lyric\n$tlyric';
+        _lyric = response['lrc']?['lyric'] ?? '';
+        _tlyric = response['tlyric']?['lyric'] ?? '';
         notifyListeners();
       }
     } catch (e) {

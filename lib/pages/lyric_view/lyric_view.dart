@@ -5,6 +5,12 @@ import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
 
 class CustomUINetease extends UINetease {
+  CustomUINetease() {
+    // 设置行间距
+    lineGap = 16.0; // 歌词行之间的间距（默认通常是16-20）
+    inlineGap = 4.0; // 主歌词和翻译歌词之间的间距（默认通常是10）
+  }
+
   @override
   TextStyle getPlayingMainTextStyle() =>
       TextStyle(color: Colors.red, fontSize: 14.0, fontWeight: FontWeight.bold);
@@ -12,12 +18,23 @@ class CustomUINetease extends UINetease {
   @override
   TextStyle getOtherMainTextStyle() => TextStyle(
     color: Colors.black45,
-    fontSize: 14.0,
+    fontSize: 13.0,
     fontWeight: FontWeight.bold,
   );
 
   TextStyle getMainTextStyle() =>
       TextStyle(color: Colors.grey, fontSize: defaultSize);
+
+  @override
+  TextStyle getPlayingExtTextStyle() => TextStyle(
+    color: Colors.red.withValues(alpha: 0.8),
+    fontSize: 13.0,
+    fontWeight: FontWeight.normal,
+  );
+
+  @override
+  TextStyle getOtherExtTextStyle() =>
+      TextStyle(color: Colors.grey.withValues(alpha: 0.7), fontSize: 12.0);
 }
 
 class LyricView extends StatefulWidget {
@@ -29,6 +46,7 @@ class LyricView extends StatefulWidget {
 
 class _LyricViewState extends State<LyricView> {
   String _lyric = "暂无歌词";
+  String _tlyric = "";
   bool _isPlaying = false;
   int currentPosition = 0;
 
@@ -37,11 +55,13 @@ class _LyricViewState extends State<LyricView> {
     super.didChangeDependencies();
 
     final lyric = context.watch<AudioStore>().lyric;
+    final tlyric = context.watch<AudioStore>().tlyric;
     final isPlaying = context.watch<AudioStore>().isPlaying;
     final position = context.watch<AudioStore>().position;
 
     setState(() {
       _lyric = lyric;
+      _tlyric = tlyric;
       _isPlaying = isPlaying;
       currentPosition = position.inMilliseconds;
     });
@@ -49,9 +69,13 @@ class _LyricViewState extends State<LyricView> {
 
   @override
   Widget build(BuildContext context) {
-    var lyricModel = LyricsModelBuilder.create()
-        .bindLyricToMain(_lyric)
-        .getModel();
+    var lyricModelBuilder = LyricsModelBuilder.create().bindLyricToMain(_lyric);
+
+    if (_tlyric.isNotEmpty) {
+      lyricModelBuilder.bindLyricToExt(_tlyric);
+    }
+
+    var lyricModel = lyricModelBuilder.getModel();
 
     var customUI = CustomUINetease();
 
