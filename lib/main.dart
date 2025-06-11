@@ -4,6 +4,7 @@ import 'package:music_player/components/play_info.dart';
 import 'package:music_player/pages/play_detail/play_detail.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
+import 'package:music_player/pages/search/search.dart';
 import 'package:music_player/pages/song_comment/song_comment.dart';
 import 'package:music_player/store/audio_store.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,10 @@ void main() {
       GoRoute(
         path: '/home',
         builder: (context, state) => BasePage(child: HomePage()),
+      ),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => BasePage(child: Search()),
       ),
       GoRoute(
         path: '/playDetail',
@@ -44,7 +49,25 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (BuildContext context) => AudioStore()),
       ],
-      child: MaterialApp.router(routerConfig: router, title: '音乐播放器'),
+      child: MaterialApp.router(
+        theme: ThemeData(
+          primaryColor: Colors.blue, // 主色调（AppBar 背景）
+          scaffoldBackgroundColor: Colors.white, // 页面背景色
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor:
+                  Colors.black54, // TextButton 文字颜色// TextButton 字体大小
+            ),
+          ),
+          sliderTheme: SliderThemeData(
+            activeTrackColor: Colors.blue, // 滑块轨道颜色
+            inactiveTrackColor: Colors.grey, // 滑块未激活轨道颜色
+            thumbColor: Colors.blue, // 滑块圆点颜色
+          ),
+        ),
+        routerConfig: router,
+        title: '音乐播放器',
+      ),
     ),
   );
 }

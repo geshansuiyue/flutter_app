@@ -45,6 +45,7 @@ class _PlayInfoState extends State<PlayInfo> {
       '/playDetail',
       '/lyricView',
       '/songComment',
+      '/search',
     ].contains(currentRoute);
     final audioProvider = Provider.of<AudioStore>(context);
     if (song == null) {
