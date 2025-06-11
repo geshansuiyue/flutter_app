@@ -21,7 +21,7 @@ class PlayDetail extends StatefulWidget {
 }
 
 class _PlayDetailState extends State<PlayDetail> {
-  SongItem? song;
+  SongItem? _song;
   bool _isPlaying = false;
   List<int> _likedList = [];
   bool _isShowLyric = false;
@@ -40,14 +40,14 @@ class _PlayDetailState extends State<PlayDetail> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final currentSong = context.read<AudioStore>().song;
-    final isPlaying = context.read<AudioStore>().isPlaying;
-    final likedList = context.read<AudioStore>().likedSongList;
-    final songCommentInfo = context.read<AudioStore>().songCommentInfo;
+    final currentSong = context.watch<AudioStore>().song;
+    final isPlaying = context.watch<AudioStore>().isPlaying;
+    final likedList = context.watch<AudioStore>().likedSongList;
+    final songCommentInfo = context.watch<AudioStore>().songCommentInfo;
 
     if (currentSong?.id != null) {
       setState(() {
-        song = currentSong;
+        _song = currentSong;
         _isPlaying = isPlaying;
         _likedList = likedList;
         _songCommentInfo = songCommentInfo;
@@ -115,11 +115,11 @@ class _PlayDetailState extends State<PlayDetail> {
 
   @override
   Widget build(BuildContext context) {
-    if (song == null) {
+    if (_song == null) {
       return const Center(child: Text('No song selected'));
     }
 
-    final isLiked = _likedList.contains(song!.id);
+    final isLiked = _likedList.contains(_song!.id);
     final curDuration = context.watch<AudioStore>().duration;
     final curPosition = context.watch<AudioStore>().position;
     final percent = curDuration > Duration.zero
@@ -137,7 +137,7 @@ class _PlayDetailState extends State<PlayDetail> {
               _isShowLyric
                   ? LyricView(changeIsLyric: _changIsLyric)
                   : Info(
-                      song: song!,
+                      song: _song!,
                       total: _songCommentInfo.total,
                       isLiked: isLiked,
                       likeSong: _likeSong,
