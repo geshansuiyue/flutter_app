@@ -25,6 +25,14 @@ class _SearchState extends State<Search> {
     });
   }
 
+  /// 从共享首选项加载搜索查询历史记录并更新 `_searchHistory` 状态。
+  ///
+  /// 此方法使用键名 '_searchQuery' 从持久存储中检索之前保存的
+  /// 搜索查询列表。如果列表存在，它会通过调用 `setState` 更新
+  /// 本地 `_searchHistory` 变量。
+  ///
+  /// 通常在搜索页面初始化时使用此方法来恢复用户的搜索历史。
+
   Future<void> _loadSearchQuery() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List<String>? savedQueryList = prefs
@@ -46,6 +54,10 @@ class _SearchState extends State<Search> {
     if (savedQueryList != null && savedQueryList.contains(_searchQuery)) {
       // 如果查询已存在，则不保存
       return;
+    }
+
+    if (savedQueryList != null && savedQueryList.length >= 6) {
+      savedQueryList.removeAt(0); // 删除最旧的查询
     }
 
     await prefs.setStringList('_searchQuery', [
@@ -162,7 +174,6 @@ class _SearchState extends State<Search> {
               ),
               Wrap(
                 spacing: 8.0,
-                runSpacing: 4.0,
                 children: (_searchHistory).map((query) {
                   return GestureDetector(
                     onTap: () {
@@ -172,6 +183,8 @@ class _SearchState extends State<Search> {
                       _handleSearch();
                     },
                     child: Chip(
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      labelStyle: TextStyle(fontSize: 12),
                       backgroundColor: Colors.grey[200],
                       label: Text(query),
                       onDeleted: () async {

@@ -37,13 +37,9 @@ class CusTextField extends StatelessWidget {
         hintText: '搜索音乐、歌手、歌词',
         hintStyle: TextStyle(color: Colors.grey[600], fontSize: 12),
 
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Colors.grey, width: 0.5),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Colors.grey, width: 0.5),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       ),
