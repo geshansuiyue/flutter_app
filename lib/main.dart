@@ -80,7 +80,7 @@ class BasePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: Padding(padding: EdgeInsets.only(top: 10), child: child),
       bottomNavigationBar: PlayInfo(), // 将播放栏放在这里
     );
   }
