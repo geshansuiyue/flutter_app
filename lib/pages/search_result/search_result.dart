@@ -4,6 +4,7 @@ import 'package:music_player/api/search/search.dart';
 import 'package:music_player/components/cus_text_field.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/search_result/components/artists.dart';
+import 'package:music_player/pages/search_result/components/playlists.dart';
 import 'package:music_player/pages/search_result/components/songs.dart';
 import 'package:music_player/pages/search_result/type.dart';
 
@@ -136,13 +137,22 @@ class _SearchResultState extends State<SearchResult>
                         ),
                       const SizedBox(height: 20), // 添加间距
                       Songs(songs: _searchResultInfo.song.songs),
+                      const SizedBox(height: 20), // 添加间距
+                      if (_searchResultInfo.playlist.playlists.isNotEmpty)
+                        Playlists(
+                          playlists: _searchResultInfo.playlist.playlists,
+                        ),
                     ],
                   ),
                 ),
                 SingleChildScrollView(
                   child: Songs(songs: _searchResultInfo.song.songs),
                 ),
-                Songs(songs: []),
+                SingleChildScrollView(
+                  child: Playlists(
+                    playlists: _searchResultInfo.playlist.playlists,
+                  ),
+                ),
                 Songs(songs: []),
                 Songs(songs: []),
                 Songs(songs: []),
