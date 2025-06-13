@@ -26,6 +26,14 @@ class RecommendListItem {
     required this.name,
     required this.picUrl,
   });
+
+  factory RecommendListItem.fromJson(Map<String, dynamic> json) {
+    return RecommendListItem(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      picUrl: (json['picUrl'] ?? json['coverImgUrl']) as String,
+    );
+  }
 }
 
 class ArInfo {
@@ -60,4 +68,16 @@ class SongItem {
     required this.al,
     required this.ar,
   });
+
+  factory SongItem.fromJson(Map<String, dynamic> json) {
+    return SongItem(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      mainTitle: (json['mainTitle'] ?? '') as String,
+      al: AlInfo.fromJson(json['al'] as Map<String, dynamic>),
+      ar: (json['ar'] as List<dynamic>)
+          .map((e) => ArInfo(id: e['id'] as int, name: e['name'] as String))
+          .toList(),
+    );
+  }
 }

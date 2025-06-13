@@ -6,8 +6,14 @@ import 'package:provider/provider.dart';
 class SongInfo extends StatelessWidget {
   final SongItem song;
   final bool? isInPlaylist;
+  final bool needImg;
 
-  const SongInfo({super.key, required this.song, this.isInPlaylist});
+  const SongInfo({
+    super.key,
+    required this.song,
+    this.isInPlaylist,
+    this.needImg = true,
+  });
 
   void _handlePlaySong(BuildContext context, int songId) {
     // 可能需要更新当前播放的歌曲ID
@@ -29,14 +35,15 @@ class SongInfo extends StatelessWidget {
           children: [
             Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: Image(
-                    image: NetworkImage(song.al.picUrl),
-                    width: 60,
-                    height: 60,
+                if (needImg)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Image(
+                      image: NetworkImage(song.al.picUrl),
+                      width: 60,
+                      height: 60,
+                    ),
                   ),
-                ),
                 SizedBox(width: 10),
                 Padding(
                   padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),

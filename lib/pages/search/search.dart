@@ -145,6 +145,9 @@ class _SearchState extends State<Search> {
       return;
     }
     await _saveSearchQuery();
+    if (mounted) {
+      context.push('/searchResult/$_searchQuery');
+    }
   }
 
   @override
