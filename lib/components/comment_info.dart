@@ -63,7 +63,15 @@ class _CommentInfoState extends State<CommentInfo> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(userInfo.nickname, style: TextStyle(fontSize: 13)),
+                        SizedBox(
+                          width: 150,
+                          child: Text(
+                            userInfo.nickname,
+                            style: TextStyle(fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
                         Text(
                           comment.timeStr,
                           style: TextStyle(fontSize: 12, color: Colors.grey),

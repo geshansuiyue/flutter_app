@@ -28,6 +28,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   void initState() {
     super.initState();
     _fetchPlaylistDetail();
+    _fetchAllSongs();
   }
 
   @override
@@ -56,6 +57,39 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     );
   }
 
+  Future<void> _fetchAllSongs() async {
+    try {
+      var response = await Request.get(
+        PlayListApi().allListSongs,
+        queryParameters: {'id': widget.id},
+      );
+
+      if (response['code'] == 200) {
+        List<SongItem> items = (response['songs'] as List<dynamic>)
+            .map(
+              (item) => SongItem(
+                id: item['id'],
+                name: item['name'] ?? '',
+                mainTitle: item['mainTitle'] ?? '',
+                al: AlInfo.fromJson(item['al']),
+                ar: (item['ar'] as List<dynamic>)
+                    .map(
+                      (arItem) =>
+                          ArInfo(id: arItem['id'], name: arItem['name']),
+                    )
+                    .toList(),
+              ),
+            )
+            .toList();
+        setState(() {
+          songs = items;
+        });
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '获取歌单歌曲失败');
+    }
+  }
+
   Future<void> _fetchPlaylistDetail() async {
     try {
       var response = await Request.get(
@@ -79,7 +113,6 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
               );
         setState(() {
           playListDetail = info;
-          songs = info.tracks;
         });
 
         if (mounted) {

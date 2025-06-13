@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
+import 'package:music_player/api/playlist/playlist.dart';
 import 'package:music_player/components/cus_text_field.dart';
+import 'package:music_player/http/request.dart';
+import 'package:music_player/pages/home/type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Search extends StatefulWidget {
@@ -12,11 +17,42 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   String _searchQuery = '';
   List<String> _searchHistory = [];
+  List<RecommendListItem> _recommendList = [];
 
   @override
   void initState() {
     super.initState();
+    _loadRecommendList();
     _loadSearchQuery();
+  }
+
+  Future<void> _loadRecommendList() async {
+    try {
+      var response = await Request.get(
+        PlayListApi().recommendPlaylist,
+        queryParameters: {'limit': 6},
+      );
+
+      if (response['code'] == 200) {
+        List<RecommendListItem> items = (response['result'] as List<dynamic>)
+            .map(
+              (item) => RecommendListItem(
+                picUrl: item['picUrl'],
+                id: item['id'],
+                name: item['name'] ?? '',
+              ),
+            )
+            .toList();
+        setState(() {
+          _recommendList = items;
+        });
+      } else {
+        Fluttertoast.showToast(msg: '获取推荐歌单失败');
+      }
+    } catch (e) {
+      // 处理异常
+      Fluttertoast.showToast(msg: '获取歌单失败');
+    }
   }
 
   void _onChanged(String value) {
@@ -24,14 +60,6 @@ class _SearchState extends State<Search> {
       _searchQuery = value;
     });
   }
-
-  /// 从共享首选项加载搜索查询历史记录并更新 `_searchHistory` 状态。
-  ///
-  /// 此方法使用键名 '_searchQuery' 从持久存储中检索之前保存的
-  /// 搜索查询列表。如果列表存在，它会通过调用 `setState` 更新
-  /// 本地 `_searchHistory` 变量。
-  ///
-  /// 通常在搜索页面初始化时使用此方法来恢复用户的搜索历史。
 
   Future<void> _loadSearchQuery() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -193,6 +221,39 @@ class _SearchState extends State<Search> {
                     ),
                   );
                 }).toList(),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('猜你喜欢', style: TextStyle(fontSize: 16)),
+              GridView.builder(
+                shrinkWrap: true,
+                itemCount: _recommendList.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 30,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1,
+                ),
+                itemBuilder: (context, index) {
+                  final item = _recommendList[index];
+
+                  return GestureDetector(
+                    onTap: () {
+                      context.push('/playlistDetail/${item.id}');
+                    },
+                    child: Text(
+                      item.name,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                },
               ),
             ],
           ),
