@@ -1,25 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:music_player/api/playlist/playlist.dart';
+import 'package:intl/intl.dart';
+import 'package:music_player/api/album/album.dart';
 import 'package:music_player/components/song_info.dart';
 import 'package:music_player/http/request.dart';
-import 'package:music_player/pages/home/type.dart';
-import 'package:music_player/pages/playlist_detail/type.dart';
+import 'package:music_player/pages/album_detail/type.dart';
 import 'package:music_player/store/audio_store.dart';
 import 'package:music_player/utils/helper.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistDetail extends StatefulWidget {
+class AlbumDetail extends StatefulWidget {
   final String? id;
 
-  const PlaylistDetail({super.key, required this.id});
+  const AlbumDetail({super.key, required this.id});
   @override
-  State<PlaylistDetail> createState() => _PlaylistDetailState();
+  State<AlbumDetail> createState() => _AlbumDetailState();
 }
 
-class _PlaylistDetailState extends State<PlaylistDetail> {
-  List<SongItem> songs = [];
-  late ListDetailInfo playListDetail;
+class _AlbumDetailState extends State<AlbumDetail> {
+  AlbumInfo albumInfo = AlbumInfo(
+    songs: [],
+    coverUrl: '',
+    album: AlubmDetail(
+      name: '',
+      id: '',
+      picUrl: '',
+      artists: [],
+      description: '',
+      albumIntInfo: AlbumIntInfo(commentCount: 0, shareCount: 0),
+      publishTime: 0,
+    ),
+  );
   final ScrollController _scrollController = ScrollController();
   final double _songHeight = 70.0; // AppBar的高度
   int prevIndex = 0;
@@ -28,7 +39,6 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   void initState() {
     super.initState();
     _fetchPlaylistDetail();
-    _fetchAllSongs();
   }
 
   @override
@@ -36,7 +46,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     super.didChangeDependencies();
 
     final curSongIndex = context.watch<AudioStore>().curSongIndex;
-    if (songs.isNotEmpty) {
+    if (albumInfo.songs.isNotEmpty) {
       if (curSongIndex > 0 && curSongIndex != prevIndex) {
         // 如果当前歌曲在列表中，滚动到该歌曲位置
         _scrollterToIndex(curSongIndex);
@@ -57,66 +67,20 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
     );
   }
 
-  Future<void> _fetchAllSongs() async {
-    try {
-      var response = await Request.get(
-        PlayListApi().allListSongs,
-        queryParameters: {'id': widget.id},
-      );
-
-      if (response['code'] == 200) {
-        List<SongItem> items = (response['songs'] as List<dynamic>)
-            .map(
-              (item) => SongItem(
-                id: item['id'],
-                name: item['name'] ?? '',
-                mainTitle: item['mainTitle'] ?? '',
-                al: AlInfo.fromJson(item['al']),
-                ar: (item['ar'] as List<dynamic>)
-                    .map(
-                      (arItem) =>
-                          ArInfo(id: arItem['id'], name: arItem['name']),
-                    )
-                    .toList(),
-              ),
-            )
-            .toList();
-        setState(() {
-          songs = items;
-        });
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: '获取歌单歌曲失败');
-    }
-  }
-
   Future<void> _fetchPlaylistDetail() async {
     try {
       var response = await Request.get(
-        PlayListApi().listDetail,
+        AlbumApi().albumDetail,
         queryParameters: {'id': widget.id},
       );
       if (response['code'] == 200) {
-        ListDetailInfo info = response['playlist'] != null
-            ? ListDetailInfo.fromJson(response['playlist'])
-            : ListDetailInfo(
-                id: 0,
-                name: '',
-                playCount: 0,
-                coverImgUrl: '',
-                description: '',
-                tracks: [],
-                shareCount: 0,
-                commentCount: 0,
-                subscribedCount: 0,
-                creator: CreatorInfo(userId: 0, nickname: '', avatarUrl: ''),
-              );
+        AlbumInfo info = AlbumInfo.fromJson(response);
         setState(() {
-          playListDetail = info;
+          albumInfo = info;
         });
 
         if (mounted) {
-          context.read<AudioStore>().setCurPlayListSongs(songs);
+          context.read<AudioStore>().setCurPlayListSongs(info.songs);
         }
       }
     } catch (e) {
@@ -125,6 +89,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   }
 
   void _handlePlayAll(BuildContext context) {
+    final songs = albumInfo.songs;
+
     if (songs.isEmpty) {
       Fluttertoast.showToast(msg: '歌单为空，无法播放');
     } else {
@@ -137,6 +103,19 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final songs = albumInfo.songs;
+    final artists = albumInfo.album.artists;
+    final artistsStr = artists.isNotEmpty
+        ? artists.map((artist) => artist.name).join(' / ')
+        : '未知艺术家';
+
+    DateTime dateTimeFromMillis = DateTime.fromMillisecondsSinceEpoch(
+      albumInfo.album.publishTime,
+    );
+    final String publishDate = DateFormat(
+      'yyyy-MM-dd',
+    ).format(dateTimeFromMillis);
+
     if (!songs.isNotEmpty) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -161,7 +140,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(5.0),
                         child: Image(
-                          image: NetworkImage(playListDetail.coverImgUrl),
+                          image: NetworkImage(albumInfo.album.picUrl),
                           width: 100,
                           height: 100,
                         ),
@@ -174,52 +153,37 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              playListDetail.name,
+                              albumInfo.album.name,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
                                 color: Colors.black87,
                               ),
                             ),
                             SizedBox(height: 5),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadiusGeometry.circular(
-                                    10,
-                                  ),
-                                  child: Image(
-                                    width: 20,
-                                    height: 20,
-                                    image: NetworkImage(
-                                      playListDetail.creator.avatarUrl,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  playListDetail.creator.nickname,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                                SizedBox(width: 15),
-                                Text(
-                                  '${NumberFormatUtil.formatWithUnit(playListDetail.playCount)}次播放',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              '歌手：$artistsStr',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
                             ),
                             SizedBox(height: 5),
                             Text(
-                              playListDetail.description ?? '暂无简介',
+                              '发行时间：$publishDate',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              albumInfo.album.description,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -243,7 +207,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                       icon: const Icon(Icons.share_rounded),
                       label: Text(
                         NumberFormatUtil.formatWithUnit(
-                          playListDetail.shareCount,
+                          albumInfo.album.albumIntInfo.shareCount,
                         ),
                         style: TextStyle(fontSize: 12),
                       ),
@@ -255,7 +219,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                       icon: const Icon(Icons.comment),
                       label: Text(
                         NumberFormatUtil.formatWithUnit(
-                          playListDetail.commentCount,
+                          albumInfo.album.albumIntInfo.commentCount,
                         ),
                         style: TextStyle(fontSize: 12),
                       ),
@@ -267,7 +231,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                       icon: const Icon(Icons.collections),
                       label: Text(
                         NumberFormatUtil.formatWithUnit(
-                          playListDetail.subscribedCount,
+                          albumInfo.album.albumIntInfo.shareCount,
                         ),
                         style: TextStyle(fontSize: 12),
                       ),
@@ -287,7 +251,11 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
 
                       return Column(
                         children: [
-                          SongInfo(song: item, isInPlaylist: true),
+                          SongInfo(
+                            song: item,
+                            isInPlaylist: true,
+                            needImg: false,
+                          ),
                           SizedBox(height: marginBottom),
                         ],
                       );

@@ -26,13 +26,7 @@ class _RecommendListState extends State<RecommendList> {
       var response = await Request.get(HomeApi().personalized);
       if (response['code'] == 200) {
         List<RecommendListItem> items = (response['recommend'] as List<dynamic>)
-            .map(
-              (item) => RecommendListItem(
-                picUrl: item['picUrl'],
-                id: item['id'],
-                name: item['name'] ?? '',
-              ),
-            )
+            .map((item) => RecommendListItem.fromJson(item))
             .toList();
         setState(() {
           playList = items;
@@ -47,7 +41,7 @@ class _RecommendListState extends State<RecommendList> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
-      child: Playlistview(playList: playList, title: '推荐歌单'),
+      child: PlaylistView(playList: playList, title: '推荐歌单'),
     );
   }
 }

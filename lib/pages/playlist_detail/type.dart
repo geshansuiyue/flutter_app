@@ -26,7 +26,7 @@ class ListDetailInfo {
   final String name;
   final int playCount;
   final String coverImgUrl;
-  final String description;
+  final String? description;
   final List<SongItem> tracks;
   final CreatorInfo creator;
   final int shareCount;
@@ -38,7 +38,7 @@ class ListDetailInfo {
     required this.name,
     required this.playCount,
     required this.coverImgUrl,
-    required this.description,
+    this.description,
     required this.tracks,
     required this.creator,
     required this.shareCount,
@@ -56,7 +56,7 @@ class ListDetailInfo {
       subscribedCount: json['subscribedCount'] ?? 0,
       playCount: json['playCount'] ?? 0,
       coverImgUrl: json['coverImgUrl'],
-      description: json['description'] as String,
+      description: json['description'],
       tracks: (json['tracks'] as List<dynamic>)
           .map(
             (item) => SongItem(
