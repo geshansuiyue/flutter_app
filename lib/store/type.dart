@@ -85,3 +85,19 @@ class SongCommentInfo {
     );
   }
 }
+
+class SubSingersInfo {
+  final String name;
+  final int id;
+  final String picUrl;
+
+  SubSingersInfo({required this.name, required this.id, required this.picUrl});
+
+  factory SubSingersInfo.fromJson(Map<String, dynamic> json) {
+    return SubSingersInfo(
+      name: json['name'] as String? ?? '',
+      id: json['id'] as int? ?? 0,
+      picUrl: json['picUrl'] as String? ?? '',
+    );
+  }
+}

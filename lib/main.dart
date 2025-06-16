@@ -9,6 +9,7 @@ import 'package:music_player/pages/search/search.dart';
 import 'package:music_player/pages/search_result/search_result.dart';
 import 'package:music_player/pages/song_comment/song_comment.dart';
 import 'package:music_player/store/audio_store.dart';
+import 'package:music_player/store/user_store.dart';
 import 'package:provider/provider.dart';
 import 'pages/login/login.dart';
 
@@ -64,6 +65,9 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (BuildContext context) => AudioStore()),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => UserStore()..fetchSubSingers(),
+        ),
       ],
       child: MaterialApp.router(
         theme: ThemeData(

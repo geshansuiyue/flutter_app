@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_player/api/artist/artist.dart';
+import 'package:music_player/api/user/user_api.dart';
 import 'package:music_player/http/request.dart';
 import 'package:music_player/pages/search_result/type.dart';
+import 'package:music_player/store/user_store.dart';
 import 'package:music_player/utils/helper.dart';
+import 'package:provider/provider.dart';
 
 class ArtistInfoView extends StatefulWidget {
   final ArtistInfo info;
-  const ArtistInfoView({super.key, required this.info});
+  final bool isSubed;
+  const ArtistInfoView({super.key, required this.info, required this.isSubed});
 
   @override
   State<ArtistInfoView> createState() => _ArtistInfoViewState();
@@ -15,7 +19,6 @@ class ArtistInfoView extends StatefulWidget {
 
 class _ArtistInfoViewState extends State<ArtistInfoView> {
   int _fansCount = 0;
-  bool _isFollowing = false;
   int _songsCount = 0;
 
   @override
@@ -35,7 +38,6 @@ class _ArtistInfoViewState extends State<ArtistInfoView> {
       if (response['code'] == 200) {
         setState(() {
           _fansCount = response['data']['fansCnt'];
-          _isFollowing = response['data']['isFollow'];
         });
       } else {
         Fluttertoast.showToast(msg: '获取粉丝数量失败');
@@ -61,6 +63,27 @@ class _ArtistInfoViewState extends State<ArtistInfoView> {
       }
     } catch (e) {
       Fluttertoast.showToast(msg: '获取歌曲数量失败');
+    }
+  }
+
+  Future<void> _toggetSubSinger() async {
+    try {
+      var response = await Request.get(
+        UserApi().toggleSubSinger,
+        queryParameters: {
+          'id': widget.info.id,
+          't': widget.isSubed ? 2 : 1,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+
+      if (response['code'] == 200) {
+        if (mounted) {
+          context.read<UserStore>().fetchSubSingers();
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: '操作失败，请重试');
     }
   }
 
@@ -90,11 +113,16 @@ class _ArtistInfoViewState extends State<ArtistInfoView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: const Color.fromARGB(221, 32, 6, 6),
+                    SizedBox(
+                      width: 150,
+                      child: Text(
+                        name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: const Color.fromARGB(221, 32, 6, 6),
+                        ),
                       ),
                     ),
                     Row(
@@ -115,12 +143,15 @@ class _ArtistInfoViewState extends State<ArtistInfoView> {
               ],
             ),
             InkWell(
+              onTap: () {
+                _toggetSubSinger();
+              },
               child: Chip(
                 label: Text(
-                  _isFollowing ? '取消关注' : '关注',
+                  widget.isSubed ? '取消关注' : '关注',
                   style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
-                backgroundColor: _isFollowing ? Colors.red : Colors.grey,
+                backgroundColor: widget.isSubed ? Colors.red : Colors.grey,
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
