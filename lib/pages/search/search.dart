@@ -108,12 +108,12 @@ class _SearchState extends State<Search> {
     }
 
     if (savedQueryList != null && savedQueryList.length >= 6) {
-      savedQueryList.removeAt(0); // 删除最旧的查询
+      savedQueryList.removeAt(5); // 删除最旧的查询
     }
 
     await prefs.setStringList('_searchQuery', [
-      ...(savedQueryList ?? []),
       _searchQuery,
+      ...(savedQueryList ?? []),
     ]);
 
     await _loadSearchQuery();

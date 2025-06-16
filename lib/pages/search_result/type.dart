@@ -20,12 +20,12 @@ class SearchResultTypeEnum {
       SearchResultTypeItem(name: '单曲', code: 1),
       SearchResultTypeItem(name: '歌单', code: 1000),
       SearchResultTypeItem(name: '专辑', code: 10),
-      SearchResultTypeItem(name: '播客', code: 1009),
+      // SearchResultTypeItem(name: '播客', code: 1009),
       SearchResultTypeItem(name: '歌手', code: 100),
-      SearchResultTypeItem(name: '用户', code: 1002),
-      SearchResultTypeItem(name: '歌词', code: 1006),
-      SearchResultTypeItem(name: '视频', code: 1014),
-      SearchResultTypeItem(name: '声音', code: 2000),
+      // SearchResultTypeItem(name: '用户', code: 1002),
+      // SearchResultTypeItem(name: '歌词', code: 1006),
+      // SearchResultTypeItem(name: '视频', code: 1014),
+      // SearchResultTypeItem(name: '声音', code: 2000),
     ],
   );
 }

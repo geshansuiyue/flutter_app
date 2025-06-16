@@ -89,6 +89,16 @@ class _SearchResultState extends State<SearchResult>
             );
           });
         }
+        if (index == 4) {
+          setState(() {
+            _searchResultInfo = SearchResultInfo(
+              song: _searchResultInfo.song,
+              playlist: _searchResultInfo.playlist,
+              artist: SearchArtistInfo.fromJson(response['result']),
+              album: _searchResultInfo.album,
+            );
+          });
+        }
       } else {
         Fluttertoast.showToast(msg: '获取搜索结果失败');
       }
@@ -193,12 +203,9 @@ class _SearchResultState extends State<SearchResult>
                 SingleChildScrollView(
                   child: Albums(albums: _searchResultInfo.album.albums),
                 ),
-                Songs(songs: []),
-                Songs(songs: []),
-                Songs(songs: []),
-                Songs(songs: []),
-                Songs(songs: []),
-                Songs(songs: []),
+                SingleChildScrollView(
+                  child: Artists(artists: _searchResultInfo.artist.artists),
+                ),
               ],
             ),
           ),
