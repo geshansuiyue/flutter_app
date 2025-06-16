@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:music_player/components/play_info.dart';
+import 'package:music_player/pages/album_detail/album_detail.dart';
 import 'package:music_player/pages/play_detail/play_detail.dart';
 import 'package:music_player/pages/playlist_detail/playlist_detail.dart';
 import 'package:music_player/pages/home/home.dart';
@@ -47,6 +48,13 @@ void main() {
         builder: (context, state) {
           final keyword = state.pathParameters['keyword'];
           return BasePage(child: SearchResult(keyword: keyword ?? ''));
+        },
+      ),
+      GoRoute(
+        path: '/albumDetail/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return BasePage(child: AlbumDetail(id: id));
         },
       ),
     ],

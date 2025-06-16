@@ -14,7 +14,7 @@ class HorAlbumView extends StatelessWidget {
     DateTime dateTimeFromMillis = DateTime.fromMillisecondsSinceEpoch(
       album.publishTime,
     );
-    final String publistDate = DateFormat(
+    final String publishDate = DateFormat(
       'yyyy-MM-dd',
     ).format(dateTimeFromMillis);
 
@@ -24,7 +24,7 @@ class HorAlbumView extends StatelessWidget {
         height: 50,
         child: InkWell(
           onTap: () {
-            context.push('/playlistDetail/${album.id}');
+            context.push('/albumDetail/${album.id}');
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +57,7 @@ class HorAlbumView extends StatelessWidget {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          publistDate,
+                          publishDate,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
