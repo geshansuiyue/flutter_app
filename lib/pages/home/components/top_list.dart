@@ -26,13 +26,7 @@ class _TopListState extends State<TopList> {
       var response = await Request.get(HomeApi().topList);
       if (response['code'] == 200) {
         List<RecommendListItem> items = (response['list'] as List<dynamic>)
-            .map(
-              (item) => RecommendListItem(
-                id: item['id'],
-                name: item['description'] ?? '',
-                picUrl: item['coverImgUrl'],
-              ),
-            )
+            .map((item) => RecommendListItem.fromJson(item))
             .toList()
             .sublist(0, 6);
         setState(() {

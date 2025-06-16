@@ -39,13 +39,7 @@ class _SearchState extends State<Search> {
 
       if (response['code'] == 200) {
         List<RecommendListItem> items = (response['result'] as List<dynamic>)
-            .map(
-              (item) => RecommendListItem(
-                picUrl: item['picUrl'],
-                id: item['id'],
-                name: item['name'] ?? '',
-              ),
-            )
+            .map((item) => RecommendListItem.fromJson(item))
             .toList();
         setState(() {
           _recommendList = items;

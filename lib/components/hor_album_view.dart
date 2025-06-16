@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:music_player/pages/home/type.dart';
-import 'package:music_player/utils/helper.dart';
+import 'package:intl/intl.dart';
+import 'package:music_player/pages/search_result/type.dart';
 
-class HorPlaylistView extends StatelessWidget {
-  final RecommendListItem playlist;
+class HorAlbumView extends StatelessWidget {
+  final AlbumInfo album;
 
-  const HorPlaylistView({super.key, required this.playlist});
+  const HorAlbumView({super.key, required this.album});
 
   @override
   Widget build(BuildContext context) {
+    final String artistName = album.artists.map((ar) => ar.name).join(' / ');
+    DateTime dateTimeFromMillis = DateTime.fromMillisecondsSinceEpoch(
+      album.publishTime,
+    );
+    final String publistDate = DateFormat(
+      'yyyy-MM-dd',
+    ).format(dateTimeFromMillis);
+
     return Padding(
       padding: EdgeInsets.only(top: 10),
       child: SizedBox(
         height: 50,
         child: InkWell(
           onTap: () {
-            context.push('/playlistDetail/${playlist.id}');
+            context.push('/playlistDetail/${album.id}');
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.network(
-                playlist.picUrl,
+                album.picUrl,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -34,7 +42,7 @@ class HorPlaylistView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      playlist.name,
+                      album.name,
                       style: TextStyle(fontSize: 14),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -42,27 +50,14 @@ class HorPlaylistView extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '${playlist.trackCount.toString()}首歌',
+                          artistName,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.red),
                         ),
                         SizedBox(width: 5),
                         Text(
-                          'by ${playlist.creator?.nickname}',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          '播放 ${NumberFormatUtil.formatWithUnit(playlist.playCount)}次',
+                          publistDate,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],

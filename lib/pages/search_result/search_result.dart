@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:music_player/api/search/search.dart';
 import 'package:music_player/components/cus_text_field.dart';
 import 'package:music_player/http/request.dart';
+import 'package:music_player/pages/search_result/components/album.dart';
 import 'package:music_player/pages/search_result/components/artists.dart';
 import 'package:music_player/pages/search_result/components/playlists.dart';
 import 'package:music_player/pages/search_result/components/songs.dart';
@@ -52,9 +53,42 @@ class _SearchResultState extends State<SearchResult>
       );
 
       if (response['code'] == 200) {
-        setState(() {
-          _searchResultInfo = SearchResultInfo.fromJson(response['result']);
-        });
+        final index = _tabController.index;
+        if (index == 0) {
+          setState(() {
+            _searchResultInfo = SearchResultInfo.fromJson(response['result']);
+          });
+        }
+        if (index == 1) {
+          setState(() {
+            _searchResultInfo = SearchResultInfo(
+              song: SearchSongsInfo.fromJson(response['result']),
+              playlist: _searchResultInfo.playlist,
+              artist: _searchResultInfo.artist,
+              album: _searchResultInfo.album,
+            );
+          });
+        }
+        if (index == 2) {
+          setState(() {
+            _searchResultInfo = SearchResultInfo(
+              song: _searchResultInfo.song,
+              playlist: SearchPlaylistInfo.fromJson(response['result']),
+              artist: _searchResultInfo.artist,
+              album: _searchResultInfo.album,
+            );
+          });
+        }
+        if (index == 3) {
+          setState(() {
+            _searchResultInfo = SearchResultInfo(
+              song: _searchResultInfo.song,
+              playlist: _searchResultInfo.playlist,
+              artist: _searchResultInfo.artist,
+              album: SearchAlbumInfo.fromJson(response['result']),
+            );
+          });
+        }
       } else {
         Fluttertoast.showToast(msg: '获取搜索结果失败');
       }
@@ -110,6 +144,9 @@ class _SearchResultState extends State<SearchResult>
           SizedBox(height: 20),
           TabBar(
             tabs: _tabs,
+            onTap: (index) {
+              _loadSearchData();
+            },
             dividerHeight: 0,
             indicatorColor: Colors.red,
             tabAlignment: TabAlignment.start,
@@ -153,7 +190,9 @@ class _SearchResultState extends State<SearchResult>
                     playlists: _searchResultInfo.playlist.playlists,
                   ),
                 ),
-                Songs(songs: []),
+                SingleChildScrollView(
+                  child: Albums(albums: _searchResultInfo.album.albums),
+                ),
                 Songs(songs: []),
                 Songs(songs: []),
                 Songs(songs: []),

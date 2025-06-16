@@ -26,13 +26,7 @@ class _RecommendListState extends State<RecommendList> {
       var response = await Request.get(HomeApi().personalized);
       if (response['code'] == 200) {
         List<RecommendListItem> items = (response['recommend'] as List<dynamic>)
-            .map(
-              (item) => RecommendListItem(
-                picUrl: item['picUrl'],
-                id: item['id'],
-                name: item['name'] ?? '',
-              ),
-            )
+            .map((item) => RecommendListItem.fromJson(item))
             .toList();
         setState(() {
           playList = items;

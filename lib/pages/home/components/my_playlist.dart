@@ -29,13 +29,7 @@ class _MyPlaylistState extends State<MyPlaylist> {
       );
       if (response['code'] == 200) {
         List<RecommendListItem> items = (response['playlist'] as List<dynamic>)
-            .map(
-              (item) => RecommendListItem(
-                picUrl: item['coverImgUrl'],
-                id: item['id'],
-                name: item['name'] ?? '',
-              ),
-            )
+            .map((item) => RecommendListItem.fromJson(item))
             .toList();
         setState(() {
           playList = items;

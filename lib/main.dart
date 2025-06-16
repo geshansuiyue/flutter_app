@@ -13,7 +13,7 @@ import 'pages/login/login.dart';
 
 void main() {
   final router = GoRouter(
-    initialLocation: '/searchResult/许嵩',
+    initialLocation: '/home',
     routes: [
       GoRoute(
         path: '/login',

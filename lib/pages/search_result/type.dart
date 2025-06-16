@@ -49,7 +49,7 @@ class SearchPlaylistInfo {
 
   factory SearchPlaylistInfo.fromJson(Map<String, dynamic> json) {
     return SearchPlaylistInfo(
-      playlists: (json['playLists'] as List)
+      playlists: ((json['playLists'] ?? json['playlists']) as List)
           .map((e) => RecommendListItem.fromJson(e))
           .toList(),
     );
@@ -91,12 +91,14 @@ class AlbumInfo {
   final int id;
   final String picUrl;
   final int publishTime;
+  final List<ArtistInfo> artists;
 
   AlbumInfo({
     required this.publishTime,
     required this.name,
     required this.id,
     required this.picUrl,
+    required this.artists,
   });
 
   factory AlbumInfo.fromJson(Map<String, dynamic> json) {
@@ -105,6 +107,9 @@ class AlbumInfo {
       name: json['name'] as String,
       id: json['id'] as int,
       picUrl: json['blurPicUrl'] as String,
+      artists: (json['artists'] as List)
+          .map((e) => ArtistInfo.fromJson(e))
+          .toList(),
     );
   }
 }
